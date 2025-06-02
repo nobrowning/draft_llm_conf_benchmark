@@ -199,37 +199,36 @@ Testcase
 
 # Framework Overview
 
-+-------------------+      +------------------+                                   
-|    Task Datase    |      |    LLM Agent     |       +-------------------------+
-|+----------------+ |      |+----------------+|       |        Evaluator        |
-||Network Intents | |      || Decision-making||       |+----------+ +----------+|
-||+--------+      |---(1)->|+----------------+|<-(4)-->|Reasoning | |Grnd Truth||
-|||Routing |      | |      |+------+ +------+||       ||Trajectory| |Reasoning ||
-|||Policy  | +---+| |      ||Percep| |Action|||       |+----------+ +----------+|
-||+--------+ |QoS|| |      |+------+ +------+||       |     \             /     |
-||+--------+ +---+| |      +------------------+       |      Rouge/Cos. Sim.    |
-|||Security|      | |               |                 |                         |
-||+--------+      | |               |                 |+----------+ +----------+|
-|+----------------+ |              (3)                || Final    | |Grnd Truth|| 
-|+----------------+ |               |            +---->| Configs  | |Configs   ||
-||Network Topology| |      +------------------+  |    |+----------+ +----------+|
-||+-----+ +-----+ | |      |   Environment    |  |    |     \             /     |
-|||Nodes| |Links| |---(2)->|                  |--+    |    Precision/Recall     |
-||+-----+ +-----+ | |      |    R2 --- R1     |       |                         |
-|+----------------+ |      |    |      |      |       | +---------------------+ | 
-|                   |      |    R3 --- R4     |<-(6)--->|      Testcases      | |
-|+----------------+ |      |     (GNS3)       |       | +---------------------+ |
-||Initial Configs |---(2)->|                  |       |            |            |
-|+----------------+ |      |  Emulator-based  |       |        Pass Rate        |
-|                   |      +------------------+       +-------------------------+
-+-------------------+                                            
++------------------+
+|    Task Datase   |                     +-------------------------+
+|+----------------+|    +-----------+    |        Evaluator        |
+||Network Intents ||(1) |           |(4) |+----------+ +----------+|
+||+--------+      |---->| LLM Agent |<--->|Reasoning | |Grnd Truth||
+|||Routing |      ||    |           |    ||Trajectory| |Reasoning ||
+|||Policy  | +---+||    +-----------+    |+----------+ +----------+|
+||+--------+ |QoS|||          |          |     \             /     |
+||+--------+ +---+||          |          |      Rouge/Cos. Sim.    |
+|||Security|      ||         (3)         |                         |
+||+--------+      ||          |          |+----------+ +----------+|
+|+----------------+|          |       (5)|| Final    | |Grnd Truth||
+|+----------------+|          |        +->| Configs  | |Configs   ||
+||Network Topology||    +-----------+  | |+----------+ +----------+|
+||+-----+ +-----+ ||(2) |Environment|  | |     \             /     |
+|||Nodes| |Links| |---->|           |-+  |    Precision/Recall     |
+||+-----+ +-----+ ||    | R2 --- R1 |    |                         |
+|+----------------+|    | |(GNS3)|  |(6) | +---------------------+ |
+|                  |    | R3 --- R4 |<-->| |     Testcases       | |
+|+----------------+|(2) |           |    | +---------------------+ |
+||Initial Configs |---->| Emulator- |    |            |            |
+|+----------------+|    |  based    |    |        Pass Rate        |
++------------------+    +-----------+    +-------------------------+
 
 Legend:
 (1)Task Assignment             (2)Environment Setup
-(3)Interactive Task Execution  (4)Reasoning Trajectory Export      
+(3)Interactive Task Execution  (4)Reasoning Trajectory Export
 (5)Final Configuration Export  (6)Testcase Execution
 
-Figure 1: The LLM-Assisted Network Evaluation Framework
+Figure 1: The Proposed Evaluation Framework
 
 The proposed framework is shown in Figure 1. The flow begins with a **Task Dataset** defining network intents and topologies. The **LLM Agent** perceives the environment, reasons about required actions, and applies configuration commands. The **Environment** simulates or controls real devices, providing feedback for each action. Finally, the **Evaluator** compares the agent’s outputs against ground-truth configurations and reasoning, computing scores for accuracy, completion, consistency, and efficiency.
 
