@@ -2,23 +2,15 @@
 <html lang="en" class="Internet-Draft">
 <head>
 <meta charset="utf-8">
-<meta content="Common,Greek,Latin" name="scripts">
+<meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
 <title>A Framework to Evaluate LLM Agents for Network Configuration</title>
 <meta content="Yong Cui" name="author">
 <meta content="Chang Liu" name="author">
+<meta content="Xiaohui Xie" name="author">
 <meta content="Chenguang Du" name="author">
 <meta content="
-       This document specifies an evaluation framework and related definitions
-for intent-driven network configuration using Large Language Model
-(LLM)–based agents.  The framework defines representative scenarios
-(basic configuration, fault remediation, policy optimization), intent
-expression formats (natural language and structured objectives),
-multi-dimensional evaluation metrics (configuration accuracy and task
-completion), and a minimal interactive interface for LLM agents.  It
-is intended to facilitate reproducible benchmarking of autonomous
-network‐configuration agents across simple (single-device) and complex
-(multi-device, interdependent) tasks. 
+       This document specifies an evaluation framework and related definitions for intent-driven network configuration using Large Language Model(LLM)–based agents. The framework combines an emulator-based interactive environment, a suite of representative tasks, and multi-dimensional metrics to assess reasoning quality, command accuracy, and functional correctness.  The framework aims to enable reproducible, comprehensive, and fair comparisons among LLM-driven network configuration approaches. 
     " name="description">
 <meta content="xml2rfc 3.28.1" name="generator">
 <meta content="Large Language Model" name="keyword">
@@ -32,12 +24,12 @@ network‐configuration agents across simple (single-device) and complex
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
-    lxml 5.3.0
+    lxml 5.3.1
     platformdirs 4.3.8
     pycountry 24.6.1
     PyYAML 6.0.2
     requests 2.32.3
-    setuptools 70.3.0
+    setuptools 80.9.0
     wcwidth 0.2.13
 -->
 <link href="draft-cui-nmrg-llm-benchmark.xml" rel="alternate" type="application/rfc+xml">
@@ -1061,7 +1053,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Cui, et al.</td>
-<td class="center">Expires 4 December 2025</td>
+<td class="center">Expires 5 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1074,12 +1066,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-cui-nmrg-llm-benchmark</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-06-02" class="published">2 June 2025</time>
+<time datetime="2025-06-03" class="published">3 June 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-12-04">4 December 2025</time></dd>
+<dd class="expires"><time datetime="2025-12-05">5 December 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1088,6 +1080,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </div>
 <div class="author">
       <div class="author-name">C. Liu</div>
+<div class="org">Tsinghua University</div>
+</div>
+<div class="author">
+      <div class="author-name">X. Xie</div>
 <div class="org">Tsinghua University</div>
 </div>
 <div class="author">
@@ -1100,16 +1096,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">A Framework to Evaluate LLM Agents for Network Configuration</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document specifies an evaluation framework and related definitions
-for intent-driven network configuration using Large Language Model
-(LLM)–based agents.  The framework defines representative scenarios
-(basic configuration, fault remediation, policy optimization), intent
-expression formats (natural language and structured objectives),
-multi-dimensional evaluation metrics (configuration accuracy and task
-completion), and a minimal interactive interface for LLM agents.  It
-is intended to facilitate reproducible benchmarking of autonomous
-network‐configuration agents across simple (single-device) and complex
-(multi-device, interdependent) tasks.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document specifies an evaluation framework and related definitions for intent-driven network configuration using Large Language Model(LLM)–based agents. The framework combines an emulator-based interactive environment, a suite of representative tasks, and multi-dimensional metrics to assess reasoning quality, command accuracy, and functional correctness.  The framework aims to enable reproducible, comprehensive, and fair comparisons among LLM-driven network configuration approaches.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1145,7 +1132,7 @@ network‐configuration agents across simple (single-device) and complex
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 5 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1184,94 +1171,49 @@ network‐configuration agents across simple (single-device) and complex
             <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-framework-overview" class="internal xref">Framework Overview</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
-                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-scenarios-and-task-taxonomy" class="internal xref">Scenarios and Task Taxonomy</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.1">
-                    <p id="section-toc.1-1.3.2.1.2.1.1" class="keepWithNext"><a href="#section-3.1.1" class="auto internal xref">3.1.1</a>.  <a href="#name-basic-configuration-tasks" class="internal xref">Basic Configuration Tasks</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.2">
-                    <p id="section-toc.1-1.3.2.1.2.2.1"><a href="#section-3.1.2" class="auto internal xref">3.1.2</a>.  <a href="#name-fault-remediation-tasks" class="internal xref">Fault Remediation Tasks</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.3">
-                    <p id="section-toc.1-1.3.2.1.2.3.1"><a href="#section-3.1.3" class="auto internal xref">3.1.3</a>.  <a href="#name-policy-optimization-tasks" class="internal xref">Policy Optimization Tasks</a></p>
-</li>
-                </ul>
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-components" class="internal xref">Components</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
-                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-intent-expression-formats" class="internal xref">Intent Expression Formats</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.1">
-                    <p id="section-toc.1-1.3.2.2.2.1.1"><a href="#section-3.2.1" class="auto internal xref">3.2.1</a>.  <a href="#name-natural-language-intents" class="internal xref">Natural-Language Intents</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.2">
-                    <p id="section-toc.1-1.3.2.2.2.2.1"><a href="#section-3.2.2" class="auto internal xref">3.2.2</a>.  <a href="#name-structured-objective-format" class="internal xref">Structured Objective Format</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.3">
-                    <p id="section-toc.1-1.3.2.2.2.3.1"><a href="#section-3.2.3" class="auto internal xref">3.2.3</a>.  <a href="#name-required-intent-fields" class="internal xref">Required Intent Fields</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
-                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-evaluation-metrics" class="internal xref">Evaluation Metrics</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.1">
-                    <p id="section-toc.1-1.3.2.3.2.1.1"><a href="#section-3.3.1" class="auto internal xref">3.3.1</a>.  <a href="#name-configuration-accuracy" class="internal xref">Configuration Accuracy</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.2">
-                    <p id="section-toc.1-1.3.2.3.2.2.1"><a href="#section-3.3.2" class="auto internal xref">3.3.2</a>.  <a href="#name-task-completion-rate" class="internal xref">Task Completion Rate</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.3">
-                    <p id="section-toc.1-1.3.2.3.2.3.1"><a href="#section-3.3.3" class="auto internal xref">3.3.3</a>.  <a href="#name-reasoning-consistency" class="internal xref">Reasoning Consistency</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.4">
-                    <p id="section-toc.1-1.3.2.3.2.4.1"><a href="#section-3.3.4" class="auto internal xref">3.3.4</a>.  <a href="#name-interaction-efficiency" class="internal xref">Interaction Efficiency</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
-                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-agentenvironment-interactio" class="internal xref">Agent–Environment Interaction Interface</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4.2.1">
-                    <p id="section-toc.1-1.3.2.4.2.1.1"><a href="#section-3.4.1" class="auto internal xref">3.4.1</a>.  <a href="#name-primitive-actions" class="internal xref">Primitive Actions</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4.2.2">
-                    <p id="section-toc.1-1.3.2.4.2.2.1"><a href="#section-3.4.2" class="auto internal xref">3.4.2</a>.  <a href="#name-state-queries" class="internal xref">State Queries</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4.2.3">
-                    <p id="section-toc.1-1.3.2.4.2.3.1"><a href="#section-3.4.3" class="auto internal xref">3.4.3</a>.  <a href="#name-feedback-and-error-reportin" class="internal xref">Feedback and Error Reporting</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4.2.4">
-                    <p id="section-toc.1-1.3.2.4.2.4.1"><a href="#section-3.4.4" class="auto internal xref">3.4.4</a>.  <a href="#name-extensibility-consideration" class="internal xref">Extensibility Considerations</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5">
-                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-example-workflow" class="internal xref">Example Workflow</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6">
-                <p id="section-toc.1-1.3.2.6.1"><a href="#section-3.6" class="auto internal xref">3.6</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-workflow" class="internal xref">Workflow</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-references" class="internal xref">References</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-data-model" class="internal xref">Data Model</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
-                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-task-definition-schema" class="internal xref">Task Definition Schema</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-agent-network-interface-ani" class="internal xref">Agent-Network Interface (ANI)</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-task-evaluation-interface" class="internal xref">Task Evaluation Interface</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1282,20 +1224,16 @@ network‐configuration agents across simple (single-device) and complex
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">Network configuration tasks range from simple port and VLAN configuration on a single device to complex multi-device coordination for policy enforcement, traffic engineering, and fault remediation. Traditional automation tools rely on manually written scripts or narrow-scope synthesis modules; recent research shows promising results in using LLMs to translate intent into configuration commands. However, there is no standardized methodology to evaluate LLM agents in realistic, intent-driven workflows across diverse scenarios.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">This document defines the Intent-Driven Network Configuration Evaluation Framework (IDNCEF), which specifies:<a href="#section-1-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-1-3">
-<pre>
-A taxonomy of representative scenarios, classified by complexity (simple vs. complex) and task category (basic configuration, fault remediation, policy optimization).
-
-An intent expression format that supports both free-form natural language and a minimal structured objective schema.
-
-Multi-dimensional evaluation metrics: configuration accuracy, task completion rate, reasoning consistency, and interaction efficiency.
-
-A minimal, emulator-agnostic interaction interface that enables closed-loop agent workflows (observe, reason, apply, verify).
-</pre><a href="#section-1-3" class="pilcrow">¶</a>
-</div>
-<p id="section-1-4">The framework ensures reproducible, fair evaluation of different LLM-based designs, identifies current limitations, and guides future improvements in autonomous network configuration.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-1">Network configuration is fundamental to ensuring network stability, scalability, and conformance with intended design behavior. Effective configuration requires not only a comprehensive understanding of network technologies but also advanced capabilities for interpreting complex topologies, analyzing dependencies, and specifying parameters accurately.  Traditional automation approaches such as Ansible playbooks<span>[<a href="#A2023" class="cite xref">A2023</a>]</span>, NETCONF<span>[<a href="#RFC6241" class="cite xref">RFC6241</a>]</span>/YANG models<span>[<a href="#RFC7950" class="cite xref">RFC7950</a>]</span>, or program-synthesis methods—either demand extensive manual scripting or are limited to narrow problem domains<span>[<a href="#Kreutz2014" class="cite xref">Kreutz2014</a>]</span>.  In parallel, Large Language Models (LLMs) have demonstrated the ability to interpret natural‐language instructions and generate device‐specific commands, showing promise for intent‐driven automation in networking.  However, existing work remains fragmented and lacks a standardized way to measure whether an LLM can truly operate as an autonomous agent in realistic, multi‐step configuration scenarios.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Despite encouraging results in individual subtasks, most evaluations<span>[<a href="#Wang2024NetConfEval" class="cite xref">Wang2024NetConfEval</a>]</span> rely on static datasets and ad hoc metrics that do not reflect real‐world complexity.  As a result:
+- There is no common benchmark suite covering diverse configuration domains (routing, QoS, security) with clearly defined intents, topologies, and ground truth.
+- Existing tests seldom involve interactive environments that emulate vendor‐specific device behavior or provide runtime feedback on command execution.
+- Evaluation metrics are often limited to simple syntactic checks or isolated command validation, failing to capture whether the intended network behavior is actually achieved.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">Consequently, it is difficult to compare different LLM approaches or to identify gaps in reasoning, context‐sensitivity, and error‐correction capabilities<span>[<a href="#Long2025" class="cite xref">Long2025</a>]</span><span>[<a href="#Liu2024" class="cite xref">Liu2024</a>]</span><span>[<a href="#Fuad2024" class="cite xref">Fuad2024</a>]</span><span>[<a href="#Lira2024" class="cite xref">Lira2024</a>]</span>.  To address these shortcomings, this document introduce <strong>NetConfBench</strong>, a holistic framework that provides:
+1. An emulator­based environment (built on GNS3) to simulate realistic device interactions.
+2. A benchmark suite of forty tasks spanning multiple domains, each defined by intent, topology, initial state, and expert‐validated ground truth.
+3. Multi­dimensional metrics—<em>reasoning score</em>, <em>command score</em>, and <em>testcase score</em>—that evaluate an agent’s internal reasoning coherence, semantic correctness of generated commands, and functional outcomes in the emulated network.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">NetConfBench aims to enable reproducible, comprehensive comparisons among single­turn LLMs, ReAct­style multi­turn agents, and knowledge­augmented variants, guiding future research toward truly autonomous, intent‐driven network configuration.<a href="#section-1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="terminology">
@@ -1305,18 +1243,26 @@ A minimal, emulator-agnostic interaction interface that enables closed-loop agen
       </h2>
 <p id="section-2-1">For clarity within this document, the following terms and abbreviations
 are defined:<a href="#section-2-1" class="pilcrow">¶</a></p>
-<p id="section-2-2">Agent
-  A software component powered by an LLM that consumes a task intent, interacts with a network environment, and issues configuration commands autonomously.<a href="#section-2-2" class="pilcrow">¶</a></p>
-<p id="section-2-3">Configuration Command
-  A device-specific instruction (e.g., a Cisco IOS CLI line or a Juniper Junos set statement) sent by the agent to a network device.<a href="#section-2-3" class="pilcrow">¶</a></p>
-<p id="section-2-4">Environment
-  An emulated or real network instance that exposes device status, topology information, and feedback on applied commands.<a href="#section-2-4" class="pilcrow">¶</a></p>
-<p id="section-2-5">Intent
-  A high-level specification of desired network behavior or objective, expressed in natural language or a structured format defined in this document.<a href="#section-2-5" class="pilcrow">¶</a></p>
-<p id="section-2-6">Task
-  A single evaluation unit defined by (1) a scenario category, (2) an environment topology, (3) initial device configurations, and (4) an intent. The agent is evaluated on its ability to fulfill the intent in the given environment.<a href="#section-2-6" class="pilcrow">¶</a></p>
-<p id="section-2-7">Testcase
-  A concrete, executable set of verification steps (e.g., ping tests, traffic-flow validation, policy checks) used to assert whether the agent’s final configuration satisfies the intent.<a href="#section-2-7" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2-2.1">
+          <p id="section-2-2.1.1">Agent: A software component powered by an LLM that consumes a task intent, interacts with a network environment, and issues configuration commands autonomously.<a href="#section-2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.2">
+          <p id="section-2-2.2.1">Configuration Command: A device-specific instruction (e.g., a Cisco IOS CLI line or a Juniper Junos set statement) sent by the agent to a network device.<a href="#section-2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.3">
+          <p id="section-2-2.3.1">Environment: An emulated or real network instance that exposes device status, topology information, and feedback on applied commands.<a href="#section-2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.4">
+          <p id="section-2-2.4.1">Intent: A high-level specification of desired network behavior or objective, expressed in natural language or a structured format defined in this document.<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.5">
+          <p id="section-2-2.5.1">Task: A single evaluation unit defined by (1) a scenario category, (2) an environment topology, (3) initial device configurations, and (4) an intent. The agent is evaluated on its ability to fulfill the intent in the given environment.<a href="#section-2-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-2.6">
+          <p id="section-2-2.6.1">Testcase: A concrete, executable set of verification steps (e.g., ping tests, traffic-flow validation, policy checks) used to assert whether the agent’s final configuration satisfies the intent.<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
 </section>
 </div>
 <div id="framework-overview">
@@ -1324,7 +1270,9 @@ are defined:<a href="#section-2-1" class="pilcrow">¶</a></p>
       <h2 id="name-framework-overview">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-framework-overview" class="section-name selfRef">Framework Overview</a>
       </h2>
-<p id="section-3-1">+------------------+
+<div class="alignLeft art-text artwork" id="section-3-1">
+<pre>
++------------------+
 |    Task Datase   |                     +-------------------------+
 |+----------------+|    +-----------+    |        Evaluator        |
 ||Network Intents ||(1) |           |(4) |+----------+ +----------+|
@@ -1346,917 +1294,556 @@ are defined:<a href="#section-2-1" class="pilcrow">¶</a></p>
 |+----------------+|(2) |           |    | +---------------------+ |
 ||Initial Configs |----&gt;| Emulator- |    |            |            |
 |+----------------+|    |  based    |    |        Pass Rate        |
-+------------------+    +-----------+    +-------------------------+<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">Legend:
++------------------+    +-----------+    +-------------------------+
+
+Legend:
 (1)Task Assignment             (2)Environment Setup
 (3)Interactive Task Execution  (4)Reasoning Trajectory Export
-(5)Final Configuration Export  (6)Testcase Execution<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">Figure 1: The Proposed Evaluation Framework<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">The proposed framework is shown in Figure 1. The flow begins with a <strong>Task Dataset</strong> defining network intents and topologies. The <strong>LLM Agent</strong> perceives the environment, reasons about required actions, and applies configuration commands. The <strong>Environment</strong> simulates or controls real devices, providing feedback for each action. Finally, the <strong>Evaluator</strong> compares the agent’s outputs against ground-truth configurations and reasoning, computing scores for accuracy, completion, consistency, and efficiency.<a href="#section-3-4" class="pilcrow">¶</a></p>
-<div id="scenarios-and-task-taxonomy">
+(5)Final Configuration Export  (6)Testcase Execution
+
+Figure 1: The NetConfBench Framework
+</pre><a href="#section-3-1" class="pilcrow">¶</a>
+</div>
+<p id="section-3-2">The proposed framework is shown in Figure 1. The flow begins with a <strong>Task Dataset</strong> defining network intents and topologies. The <strong>LLM Agent</strong> perceives the environment, reasons about required actions, and applies configuration commands. The <strong>Environment</strong> simulates or controls real devices, providing feedback for each action. Finally, the <strong>Evaluator</strong> compares the agent’s outputs against ground-truth configurations and reasoning, computing scores for accuracy and completion.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<div id="components">
 <section id="section-3.1">
-        <h3 id="name-scenarios-and-task-taxonomy">
-<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-scenarios-and-task-taxonomy" class="section-name selfRef">Scenarios and Task Taxonomy</a>
+        <h3 id="name-components">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-components" class="section-name selfRef">Components</a>
         </h3>
-<p id="section-3.1-1">IDNCEF categorizes tasks by scenario and complexity. Scenario categories include basic configuration, fault remediation, and policy optimization. Each category further distinguishes simple tasks (single-device only) from complex tasks (multiple devices with dependencies).<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<div id="basic-configuration-tasks">
-<section id="section-3.1.1">
-          <h4 id="name-basic-configuration-tasks">
-<a href="#section-3.1.1" class="section-number selfRef">3.1.1. </a><a href="#name-basic-configuration-tasks" class="section-name selfRef">Basic Configuration Tasks</a>
-          </h4>
-<p id="section-3.1.1-1">Basic configuration tasks involve establishing fundamental network services on one or more devices without dependencies requiring inter-device coordination beyond connectivity. These tasks are further classified as “simple” (single-device) or “complex” (multi-device but still protocol-independent).<a href="#section-3.1.1-1" class="pilcrow">¶</a></p>
-<div id="simple-basic-configuration-single-device">
-<section id="section-3.1.1.1">
-            <h5 id="name-simple-basic-configuration-">
-<a href="#section-3.1.1.1" class="section-number selfRef">3.1.1.1. </a><a href="#name-simple-basic-configuration-" class="section-name selfRef">Simple Basic Configuration (Single Device)</a>
-            </h5>
-<p id="section-3.1.1.1-1">These tasks involve only one network device. The agent receives an intent and must generate device-specific commands to configure the device. Example intents include:<a href="#section-3.1.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">NetConfBench consists of four key components:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.1-2">
+<li id="section-3.1-2.1">
+            <p id="section-3.1-2.1.1"><strong>Task Dataset</strong><br>
+A repository of forty configuration tasks, each defined as a JSON object with:<a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.1.1.1-2.1">
-                <p id="section-3.1.1.1-2.1.1">“Configure VLAN 10 on switch SW1 with name ‘Users’ and assign ports Gi1/0/1–Gi1/0/10.”<a href="#section-3.1.1.1-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.1-2.1.2.1">
+                <p id="section-3.1-2.1.2.1.1"><strong>Intent</strong>: One or more natural language instructions.<a href="#section-3.1-2.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-3.1.1.1-2.2">
-                <p id="section-3.1.1.1-2.2.1">“On router R1, enable BGP peering to AS 65001 using neighbor 192.0.2.2, advertise network 203.0.113.0/24.”<a href="#section-3.1.1.1-2.2.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-3.1-2.1.2.2">
+                <p id="section-3.1-2.1.2.2.1"><strong>Topology</strong>: A list of node names and link definitions.<a href="#section-3.1-2.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
-            </ul>
-<p id="section-3.1.1.1-3">In each case, the device has minimal or no pre-existing topology context. The agent simply transforms intent to configuration commands and verifies locally that the device responds without errors and that basic protocol sessions come up.<a href="#section-3.1.1.1-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="complex-basic-configuration-multi-device">
-<section id="section-3.1.1.2">
-            <h5 id="name-complex-basic-configuration">
-<a href="#section-3.1.1.2" class="section-number selfRef">3.1.1.2. </a><a href="#name-complex-basic-configuration" class="section-name selfRef">Complex Basic Configuration (Multi-Device)</a>
-            </h5>
-<p id="section-3.1.1.2-1">These tasks span multiple devices but do not require cross-domain policies. They typically involve establishing connectivity (e.g., VLAN trunking across switches) or protocol peering (e.g., a two-router OSPF area). Example intent:<a href="#section-3.1.1.2-1" class="pilcrow">¶</a></p>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-3.1.1.2-2.1">
-                <p id="section-3.1.1.2-2.1.1">“In the topology with switches SW1 and SW2 connected via trunk ports Gi1/0/48 and Gi2/0/48, create VLAN 20 called ‘Servers’ on both devices, and ensure hosts in VLAN 20 on SW1 can ping hosts in VLAN 20 on SW2. On R1 and R2, configure OSPF area 0, advertise 198.51.100.0/24, and verify adjacency.”<a href="#section-3.1.1.2-2.1.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-3.1-2.1.2.3">
+                <p id="section-3.1-2.1.2.3.1"><strong>Initial Configuration</strong>: The initial configuration state of all nodes.<a href="#section-3.1-2.1.2.3.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.1-2.1.2.4">
+                <p id="section-3.1-2.1.2.4.1"><strong>Ground Truth Configuration</strong>: Expert-validated CLI commands that achieve the intent.<a href="#section-3.1-2.1.2.4.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.1-2.1.2.5">
+                <p id="section-3.1-2.1.2.5.1"><strong>Ground Truth Reasoning</strong>: A narrative describing step-by-step logic used to derive the commands.<a href="#section-3.1-2.1.2.5.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.1-2.1.2.6">
+                <p id="section-3.1-2.1.2.6.1"><strong>Testcases</strong>: A set of verification procedures (e.g., <em>show</em>, <em>ping</em>, <em>ACL</em> checks) that confirm functional intent satisfaction.<a href="#section-3.1-2.1.2.6.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
-<p id="section-3.1.1.2-3">The agent must parse the intent, gather topology via the interface, plan per-device commands (e.g., switchport trunk configuration, OSPF settings), apply them in the correct order, and confirm inter-device connectivity. This requires basic multi-device state awareness but no advanced policy logic.<a href="#section-3.1.1.2-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="fault-remediation-tasks">
-<section id="section-3.1.2">
-          <h4 id="name-fault-remediation-tasks">
-<a href="#section-3.1.2" class="section-number selfRef">3.1.2. </a><a href="#name-fault-remediation-tasks" class="section-name selfRef">Fault Remediation Tasks</a>
-          </h4>
-<p id="section-3.1.2-1">Fault remediation tasks require the agent to detect or diagnose an existing issue (e.g., connectivity loss, interface down) and apply corrective configuration actions. Again, tasks are split into simple (single-device) and complex (multi-device) categories.<a href="#section-3.1.2-1" class="pilcrow">¶</a></p>
-<div id="simple-fault-remediation-single-device">
-<section id="section-3.1.2.1">
-            <h5 id="name-simple-fault-remediation-si">
-<a href="#section-3.1.2.1" class="section-number selfRef">3.1.2.1. </a><a href="#name-simple-fault-remediation-si" class="section-name selfRef">Simple Fault Remediation (Single Device)</a>
-            </h5>
-<p id="section-3.1.2.1-1">These tasks involve one device with a localized failure. Example intent:<a href="#section-3.1.2.1-1" class="pilcrow">¶</a></p>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-3.1.2.1-2.1">
-                <p id="section-3.1.2.1-2.1.1">“Interface Gi1/0/10 on switch SW1 is down. Ensure that the link is brought up, configured at 1000 Mbps full-duplex, and port security is enabled with a maximum of 2 MAC addresses.”<a href="#section-3.1.2.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
-            </ul>
-<p id="section-3.1.2.1-3">The agent must query live device state, recognize that interface Gi1/0/10 is administratively or operationally down, and issue correct commands to fix speed/duplex settings and enable port security.<a href="#section-3.1.2.1-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="complex-fault-remediation-multi-device">
-<section id="section-3.1.2.2">
-            <h5 id="name-complex-fault-remediation-m">
-<a href="#section-3.1.2.2" class="section-number selfRef">3.1.2.2. </a><a href="#name-complex-fault-remediation-m" class="section-name selfRef">Complex Fault Remediation (Multi-Device)</a>
-            </h5>
-<p id="section-3.1.2.2-1">These tasks involve a failure affecting multiple devices or requiring inter-device coordination. Example intent:<a href="#section-3.1.2.2-1" class="pilcrow">¶</a></p>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-3.1.2.2-2.1">
-                <p id="section-3.1.2.2-2.1.1">“Hosts in VLAN 30 cannot reach the Internet. On firewall FW1, verify that ACL ‘OUT-TO-IN’ allows 10.0.30.0/24 to egress and NAT is enabled. On router R3, ensure default route to ISP (203.0.113.1) is present. On switch SW3, check if VLAN 30 SVI is up. Restore full Internet connectivity for VLAN 30.”<a href="#section-3.1.2.2-2.1.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-<p id="section-3.1.2.2-3">The agent must collect state from SW3 (SVI), FW1 (ACL and NAT hits), and R3 (routing table). It must identify missing or misaligned entries (e.g., absent default route, incorrect ACL), apply corrections, then validate end-to-end reachability. This requires cross-device diagnosis and coordination.<a href="#section-3.1.2.2-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="policy-optimization-tasks">
-<section id="section-3.1.3">
-          <h4 id="name-policy-optimization-tasks">
-<a href="#section-3.1.3" class="section-number selfRef">3.1.3. </a><a href="#name-policy-optimization-tasks" class="section-name selfRef">Policy Optimization Tasks</a>
-          </h4>
-<p id="section-3.1.3-1">Policy optimization tasks involve higher-level goals such as traffic shaping, access-control adjustments, or quality-of-service (QoS) rules, typically across several devices. These are inherently complex.<a href="#section-3.1.3-1" class="pilcrow">¶</a></p>
-<div id="simple-policy-optimization-single-device">
-<section id="section-3.1.3.1">
-            <h5 id="name-simple-policy-optimization-">
-<a href="#section-3.1.3.1" class="section-number selfRef">3.1.3.1. </a><a href="#name-simple-policy-optimization-" class="section-name selfRef">Simple Policy Optimization (Single Device)</a>
-            </h5>
-<p id="section-3.1.3.1-1">Although rare, some policy changes affect only one device. Example intent:<a href="#section-3.1.3.1-1" class="pilcrow">¶</a></p>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-3.1.3.1-2.1">
-                <p id="section-3.1.3.1-2.1.1">“On router R2, limit outbound traffic to 500 Mbps on interface Gi0/0. Apply a QoS policy that shapes SSH traffic to 10 Mbps and guarantees 100 Mbps to DNS.”<a href="#section-3.1.3.1-2.1.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-<p id="section-3.1.3.1-3">The agent must convert bandwidth constraints into device-specific policer and class-map/policy-map commands, apply them, and check interface statistics.<a href="#section-3.1.3.1-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="complex-policy-optimization-multi-device">
-<section id="section-3.1.3.2">
-            <h5 id="name-complex-policy-optimization">
-<a href="#section-3.1.3.2" class="section-number selfRef">3.1.3.2. </a><a href="#name-complex-policy-optimization" class="section-name selfRef">Complex Policy Optimization (Multi-Device)</a>
-            </h5>
-<p id="section-3.1.3.2-1">These tasks involve coordinated policy enforcement across multiple devices. Example intent:<a href="#section-3.1.3.2-1" class="pilcrow">¶</a></p>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-3.1.3.2-2.1">
-                <p id="section-3.1.3.2-2.1.1">“Segment Guest traffic (VLAN 40) on SW4 and SW5 from Corporate traffic (VLAN 10). On firewall FW2, create policy so that VLAN 40 can only access the Internet on TCP/80 and TCP/443, and cannot reach internal servers. On switch SW4, implement ACL 100 to deny VLAN 40 access to VLAN 10. Confirm that VLAN 10 still has full access to internal servers and the Internet.”<a href="#section-3.1.3.2-2.1.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-<p id="section-3.1.3.2-3">The agent must partition VLANs at the switch layer, push down appropriate access-control entries, configure firewall policies, and validate isolation and permitted paths. This entails reasoning about device interdependencies and policy semantics.<a href="#section-3.1.3.2-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-</section>
-</div>
-<div id="intent-expression-formats">
-<section id="section-3.2">
-        <h3 id="name-intent-expression-formats">
-<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-intent-expression-formats" class="section-name selfRef">Intent Expression Formats</a>
-        </h3>
-<p id="section-3.2-1">IDNCEF supports two complementary intent expression formats: free-form natural language and a minimal structured schema. Each intent <strong>MUST</strong> specify certain required fields to ensure that the agent has sufficient context to plan actions.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<div id="natural-language-intents">
-<section id="section-3.2.1">
-          <h4 id="name-natural-language-intents">
-<a href="#section-3.2.1" class="section-number selfRef">3.2.1. </a><a href="#name-natural-language-intents" class="section-name selfRef">Natural-Language Intents</a>
-          </h4>
-<p id="section-3.2.1-1">Free-form natural language is the most flexible way to express intent but may introduce ambiguity. The agent <strong>SHOULD</strong> be capable of extracting actionable items from a user-provided sentence or paragraph.<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
-<div id="characteristics">
-<section id="section-3.2.1.1">
-            <h5 id="name-characteristics">
-<a href="#section-3.2.1.1" class="section-number selfRef">3.2.1.1. </a><a href="#name-characteristics" class="section-name selfRef">Characteristics</a>
-            </h5>
+          <li id="section-3.1-2.2">
+            <p id="section-3.1-2.2.1"><strong>Emulator Environment</strong><br>
+Built on GNS3, this component launches official vendor images for routers and switches, replicating realistic CLI behavior.  Key interfaces include:<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.1.1-1.1">
-                <p id="section-3.2.1.1-1.1.1"><strong>MAY</strong> contain domain-specific terminology (e.g., “OSPF area 0”, “ACL 101 permit ip any any”).<a href="#section-3.2.1.1-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.1-2.2.2.1">
+                <p id="section-3.1-2.2.2.1.1"><strong>Agent-Network Interface (ANI)</strong>: 
+ Based on the key stages commonly involved in intent-driven network configuration, we design an Agent-Network Interface to facilitate structured interactions between the LLM agent and the emulated network environment. This interface supports four core actions: <code>get-topology</code>, <code>get-running-cfg</code>, <code>update-cfg</code>, and <code>execute-cmd</code>.<a href="#section-3.1-2.2.2.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-2.2.2.1.2.1">
+                    <p id="section-3.1-2.2.2.1.2.1.1"><code>get-topology</code>: provides this information in a
+format interpretable by the LLM.<a href="#section-3.1-2.2.2.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-3.2.1.1-1.2">
-                <p id="section-3.2.1.1-1.2.1"><strong>SHOULD</strong> refer to device identifiers unambiguously (e.g., “SW1”, “R3”, “FW1”). If device names are ambiguous, parenthetical clarifications (e.g., “R3 (edge router)”) are <strong>RECOMMENDED</strong>.<a href="#section-3.2.1.1-1.2.1" class="pilcrow">¶</a></p>
+                  <li class="normal" id="section-3.1-2.2.2.1.2.2">
+                    <p id="section-3.1-2.2.2.1.2.2.1"><code>get-running-cfg</code>: enables the agent to obtain the active configurations of specified devices, providing essential context for planning.
+subsequent updates.<a href="#section-3.1-2.2.2.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-3.2.1.1-1.3">
-                <p id="section-3.2.1.1-1.3.1">Intended outcomes <strong>SHOULD</strong> be explicit (e.g., “hosts in VLAN 30 must ping 8.8.8.8”), not merely descriptive (e.g., “fix Internet issue”).<a href="#section-3.2.1.1-1.3.1" class="pilcrow">¶</a></p>
+                  <li class="normal" id="section-3.1-2.2.2.1.2.3">
+                    <p id="section-3.1-2.2.2.1.2.3.1"><code>update-cfg</code>: allows the agent to apply new configuration commands and provides detailed feedback on their execution, including whether each command was accepted or resulted in any errors.<a href="#section-3.1-2.2.2.1.2.3.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-3.2.1.1-1.4">
-                <p id="section-3.2.1.1-1.4.1"><strong>SHOULD</strong> mention SLA or performance bounds when relevant (e.g., “limit streaming traffic to 10 Mbps”).<a href="#section-3.2.1.1-1.4.1" class="pilcrow">¶</a></p>
+                  <li class="normal" id="section-3.1-2.2.2.1.2.4">
+                    <p id="section-3.1-2.2.2.1.2.4.1"><code>execute-cmd</code>: accepts a device name and a command string as parameters and returns the resulting output.<a href="#section-3.1-2.2.2.1.2.4.1" class="pilcrow">¶</a></p>
+</li>
+                </ul>
+</li>
+              <li class="normal" id="section-3.1-2.2.2.2">
+                <p id="section-3.1-2.2.2.2.1"><strong>Task Evaluation Interface</strong>: To enable reliable and objective assessment of the LLM agent’s configuration behavior, the environment provides a Task Evaluation Interface that allows the evaluation module to access relevant execution results. Specifically, this interface supports:<a href="#section-3.1-2.2.2.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-2.2.2.2.2.1">
+                    <p id="section-3.1-2.2.2.2.2.1.1"><strong>Exporting the final configurations of all devices</strong>: This allows for direct comparison with ground truth configurations to evaluate the correctness and completeness of the agent’s output.<a href="#section-3.1-2.2.2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                  <li class="normal" id="section-3.1-2.2.2.2.2.2">
+                    <p id="section-3.1-2.2.2.2.2.2.1"><strong>Executing a set of predefined testcases</strong>: These testcases are designed to verify whether the resulting network behavior accurately reflects the intended configuration objectives, as defined by the network intent.<a href="#section-3.1-2.2.2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                </ul>
 </li>
             </ul>
-</section>
-</div>
-<div id="ambiguity-handling">
-<section id="section-3.2.1.2">
-            <h5 id="name-ambiguity-handling">
-<a href="#section-3.2.1.2" class="section-number selfRef">3.2.1.2. </a><a href="#name-ambiguity-handling" class="section-name selfRef">Ambiguity Handling</a>
-            </h5>
-<p id="section-3.2.1.2-1">If the agent cannot resolve critical details (e.g., missing interface names, unclear IP prefixes), it <strong>MUST</strong> either:<a href="#section-3.2.1.2-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.2.1.2-2.1">
-                <p id="section-3.2.1.2-2.1.1">Prompt the user for clarification via an interactive sub-dialog (if multi-turn interaction is supported), or<a href="#section-3.2.1.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-3.2.1.2-2.2">
-                <p id="section-3.2.1.2-2.2.1">Fall back to using default assumptions clearly documented in its reasoning trace (e.g., “Assumed IPv4 prefix 10.0.1.0/24 for VLAN1”).<a href="#section-3.2.1.2-2.2.1" class="pilcrow">¶</a></p>
+          <li id="section-3.1-2.3">
+            <p id="section-3.1-2.3.1"><strong>LLM Agent</strong><br>
+A modular component that can be implemented with any LLM (open-source or closed-source).  It interacts with the emulator via the <strong>Agent-Network Interface</strong> (ANI), issuing queries such as <code>get-topology</code>, <code>get-running-cfg</code>, <code>update-cfg</code>, and <code>execute-cmd</code>.  Agents may use:<a href="#section-3.1-2.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-2.3.2.1">
+                <p id="section-3.1-2.3.2.1.1"><strong>Single-Turn Generation</strong>: The entire reasoning and command generation in one pass.<a href="#section-3.1-2.3.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.1-2.3.2.2">
+                <p id="section-3.1-2.3.2.2.1"><strong>ReAct-Style Multi-Turn Interaction</strong>: Interleaved reasoning and actions, with runtime feedback guiding subsequent steps.<a href="#section-3.1-2.3.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.1-2.3.2.3">
+                <p id="section-3.1-2.3.2.3.1"><strong>External Knowledge Retrieval</strong>: (Optional) Queries to a command manual to resolve vendor-specific syntax.<a href="#section-3.1-2.3.2.3.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
-<p id="section-3.2.1.2-3">For fair benchmarking, the agent’s assumption steps <strong>SHALL</strong> be logged and analyzed as part of the reasoning consistency metric.<a href="#section-3.2.1.2-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="structured-objective-format">
-<section id="section-3.2.2">
-          <h4 id="name-structured-objective-format">
-<a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-structured-objective-format" class="section-name selfRef">Structured Objective Format</a>
-          </h4>
-<p id="section-3.2.2-1">A minimal structured format provides a schema that reduces ambiguity. Structured intents consist of a JSON-like object with predefined fields. The fields are:<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2.2-2"><code>jsonc
-{
-  "task_name": &lt;string&gt;,
-  "devices": [
-    {
-      "id": &lt;string&gt;,
-      "role": &lt;string&gt;
-    },
-    …
-  ],
-  "topology": {
-    "links": [
-      {
-        "endpoints": [&lt;device_id&gt;, &lt;device_id&gt;],
-        "interfaces": [&lt;iface1&gt;, &lt;iface2&gt;]
-      },
-      …
-    ]
-  },
-  "intent": {
-    "type": &lt;string&gt;,
-    "description": &lt;string&gt;,
-    "parameters": { … }
-  }
-}
-</code><a href="#section-3.2.2-2" class="pilcrow">¶</a></p>
-<div id="parameters-for-basic-configuration">
-<section id="section-3.2.2.1">
-            <h5 id="name-parameters-for-basic-config">
-<a href="#section-3.2.2.1" class="section-number selfRef">3.2.2.1. </a><a href="#name-parameters-for-basic-config" class="section-name selfRef">Parameters for Basic Configuration</a>
-            </h5>
-<p id="section-3.2.2.1-1">For <code>type = "basic_config"</code>, <code>"parameters"</code> <strong>MUST</strong> include:<a href="#section-3.2.2.1-1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.1-2.4">
+            <p id="section-3.1-2.4.1"><strong>Evaluator</strong><br>
+Computes three core metrics for each task:<a href="#section-3.1-2.4.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.2.1-2.1">
-                <p id="section-3.2.2.1-2.1.1"><code>"config_type": &lt;string&gt;</code> (e.g., <code>"VLAN"</code>, <code>"BGP"</code>, <code>"OSPF"</code>)<a href="#section-3.2.2.1-2.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.2.2.1-2.2">
-                <p id="section-3.2.2.1-2.2.1"><code>"objects": [&lt;object definition&gt;]</code>, where each object is a nested JSON object specifying configuration details. Example:<a href="#section-3.2.2.1-2.2.1" class="pilcrow">¶</a></p>
-<p id="section-3.2.2.1-2.2.2"><code>jsonc
-{
-  "config_type": "VLAN",
-  "objects": [
-    {
-      "vlan_id": 10,
-      "name": "Users",
-      "ports": ["SW1:Gi1/0/1","SW1:Gi1/0/2"]
-    }
-  ]
-}
-</code><a href="#section-3.2.2.1-2.2.2" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-<div id="parameters-for-fault-remediation">
-<section id="section-3.2.2.2">
-            <h5 id="name-parameters-for-fault-remedi">
-<a href="#section-3.2.2.2" class="section-number selfRef">3.2.2.2. </a><a href="#name-parameters-for-fault-remedi" class="section-name selfRef">Parameters for Fault Remediation</a>
-            </h5>
-<p id="section-3.2.2.2-1">For <code>type = "fault_remediation"</code>, <code>"parameters"</code> <strong>MUST</strong> include:<a href="#section-3.2.2.2-1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.1-2.4.2.1">
+                <p id="section-3.1-2.4.2.1.1"><strong>Reasoning Score (<code>S_reasoning</code>)</strong>:<a href="#section-3.1-2.4.2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.2.2-2.1">
-                <p id="section-3.2.2.2-2.1.1"><code>"failure_type": &lt;string&gt;</code> (e.g., <code>"interface_down"</code>, <code>"routing_blackhole"</code>)<a href="#section-3.2.2.2-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.1-2.4.2.1.2.1">
+                    <p id="section-3.1-2.4.2.1.2.1.1">Embedding-based cosine similarity between the agent’s reasoning trace and the ground truth reasoning.<a href="#section-3.1-2.4.2.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-3.2.2.2-2.2">
-                <p id="section-3.2.2.2-2.2.1"><code>"scope": [&lt;device_id&gt;]</code> (devices to inspect)<a href="#section-3.2.2.2-2.2.1" class="pilcrow">¶</a></p>
+                  <li class="normal" id="section-3.1-2.4.2.1.2.2">
+                    <p id="section-3.1-2.4.2.1.2.2.1">Ranges from 0 to 1.<a href="#section-3.1-2.4.2.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-3.2.2.2-2.3">
-                <p id="section-3.2.2.2-2.3.1"><code>"symptoms": [&lt;string&gt;]</code> (e.g., <code>"interface Gi1/0/10 down"</code>, <code>"no route to host 203.0.113.5"</code>)<a href="#section-3.2.2.2-2.3.1" class="pilcrow">¶</a></p>
+                </ul>
 </li>
-              <li class="normal" id="section-3.2.2.2-2.4">
-                <p id="section-3.2.2.2-2.4.1"><code>"desired_state": { … }</code> (optional device-specific state to restore)<a href="#section-3.2.2.2-2.4.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-<div id="parameters-for-policy-optimization">
-<section id="section-3.2.2.3">
-            <h5 id="name-parameters-for-policy-optim">
-<a href="#section-3.2.2.3" class="section-number selfRef">3.2.2.3. </a><a href="#name-parameters-for-policy-optim" class="section-name selfRef">Parameters for Policy Optimization</a>
-            </h5>
-<p id="section-3.2.2.3-1">For <code>type = "policy_optimization"</code>, <code>"parameters"</code> <strong>MUST</strong> include:<a href="#section-3.2.2.3-1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-3.1-2.4.2.2">
+                <p id="section-3.1-2.4.2.2.1"><strong>Command Score (<code>S_command</code>)</strong>:<a href="#section-3.1-2.4.2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.2.3-2.1">
-                <p id="section-3.2.2.3-2.1.1"><code>"policy_domain": &lt;string&gt;</code> (e.g., <code>"access_control"</code>, <code>"QoS"</code>)<a href="#section-3.2.2.3-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.1-2.4.2.2.2.1">
+                    <p id="section-3.1-2.4.2.2.2.1.1">Hierarchical diff of final vs. initial router configurations (using Python’s <code>ciscoconfparse</code>).<a href="#section-3.1-2.4.2.2.2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-3.2.2.3-2.2">
-                <p id="section-3.2.2.3-2.2.1"><code>"criteria": { … }</code> (e.g., allow/deny prefixes, bandwidth bounds)<a href="#section-3.2.2.3-2.2.1" class="pilcrow">¶</a></p>
+                  <li class="normal" id="section-3.1-2.4.2.2.2.2">
+                    <p id="section-3.1-2.4.2.2.2.2.1">Wildcard matching ignores non-essential identifiers (e.g., ACL numbers).<a href="#section-3.1-2.4.2.2.2.2.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-3.2.2.3-2.3">
-                <p id="section-3.2.2.3-2.3.1"><code>"devices_involved": [&lt;device_id&gt;]</code><a href="#section-3.2.2.3-2.3.1" class="pilcrow">¶</a></p>
+                  <li class="normal" id="section-3.1-2.4.2.2.2.3">
+                    <p id="section-3.1-2.4.2.2.2.3.1">Compute precision = (correctly generated commands / total generated) and recall = (correctly generated / ground truth commands).<a href="#section-3.1-2.4.2.2.2.3.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-3.2.2.3-2.4">
-                <p id="section-3.2.2.3-2.4.1"><code>"performance_metrics": [&lt;string&gt;]</code> (e.g., <code>"throughput"</code>, <code>"latency"</code>)<a href="#section-3.2.2.3-2.4.1" class="pilcrow">¶</a></p>
+                  <li class="normal" id="section-3.1-2.4.2.2.2.4">
+                    <p id="section-3.1-2.4.2.2.2.4.1"><code>S_command</code> is the harmonic mean of precision and recall, ranging from 0 to 1.<a href="#section-3.1-2.4.2.2.2.4.1" class="pilcrow">¶</a></p>
 </li>
-            </ul>
-</section>
-</div>
-<div id="device-referencing">
-<section id="section-3.2.2.4">
-            <h5 id="name-device-referencing">
-<a href="#section-3.2.2.4" class="section-number selfRef">3.2.2.4. </a><a href="#name-device-referencing" class="section-name selfRef">Device Referencing</a>
-            </h5>
-<p id="section-3.2.2.4-1">Device IDs in all structured fields <strong>MUST</strong> match entries in the <code>"devices"</code> array. Interfaces <strong>MUST</strong> be fully qualified (e.g., <code>"R1:Gig0/1/0"</code>).<a href="#section-3.2.2.4-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="required-intent-fields">
-<section id="section-3.2.3">
-          <h4 id="name-required-intent-fields">
-<a href="#section-3.2.3" class="section-number selfRef">3.2.3. </a><a href="#name-required-intent-fields" class="section-name selfRef">Required Intent Fields</a>
-          </h4>
-<p id="section-3.2.3-1">Regardless of format, each intent <strong>SHALL</strong> minimally specify:<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
+                </ul>
+</li>
+              <li class="normal" id="section-3.1-2.4.2.3">
+                <p id="section-3.1-2.4.2.3.1"><strong>Testcase Score (<code>S_testcase</code>)</strong>:<a href="#section-3.1-2.4.2.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.3-2.1">
-              <p id="section-3.2.3-2.1.1">Target device(s) or roles (e.g., <code>"SW1"</code>, <code>"edge_router"</code>).<a href="#section-3.2.3-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.1-2.4.2.3.2.1">
+                    <p id="section-3.1-2.4.2.3.2.1.1">Portion of testcases passed in the emulated environment.<a href="#section-3.1-2.4.2.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-3.2.3-2.2">
-              <p id="section-3.2.3-2.2.1">Objective summary (human-readable description).<a href="#section-3.2.3-2.2.1" class="pilcrow">¶</a></p>
+                  <li class="normal" id="section-3.1-2.4.2.3.2.2">
+                    <p id="section-3.1-2.4.2.3.2.2.1">Fine-grained sub-intents (per device) each correspond to a testcase.<a href="#section-3.1-2.4.2.3.2.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-3.2.3-2.3">
-              <p id="section-3.2.3-2.3.1">Desired outcome, expressed as a measurable condition (e.g., “OSPF adjacency with cost 10 between R1 and R2”, “HTTP servers in VLAN 20 reachable from VLAN 10”).<a href="#section-3.2.3-2.3.1" class="pilcrow">¶</a></p>
+                  <li class="normal" id="section-3.1-2.4.2.3.2.3">
+                    <p id="section-3.1-2.4.2.3.2.3.1"><code>S_testcase</code> is the testcase pass rate, defined as the proportion of passed testcases among all defined testcases.<a href="#section-3.1-2.4.2.3.2.3.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-3.2.3-2.4">
-              <p id="section-3.2.3-2.4.1">Any performance constraints or policy rules (if applicable).<a href="#section-3.2.3-2.4.1" class="pilcrow">¶</a></p>
-</li>
-          </ul>
-<p id="section-3.2.3-3">If any of these are missing, the agent <strong>MUST</strong> either prompt for clarification or record assumptions and treat reduced context as part of its reasoning consistency evaluation.<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="evaluation-metrics">
-<section id="section-3.3">
-        <h3 id="name-evaluation-metrics">
-<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-evaluation-metrics" class="section-name selfRef">Evaluation Metrics</a>
-        </h3>
-<p id="section-3.3-1">IDNCEF defines four orthogonal metrics. Each metric is quantified for every scenario and then aggregated or reported per category.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
-<div id="configuration-accuracy">
-<section id="section-3.3.1">
-          <h4 id="name-configuration-accuracy">
-<a href="#section-3.3.1" class="section-number selfRef">3.3.1. </a><a href="#name-configuration-accuracy" class="section-name selfRef">Configuration Accuracy</a>
-          </h4>
-<p id="section-3.3.1-1">Configuration Accuracy measures the semantic overlap between the agent-generated configuration commands and a ground-truth reference. Ground-truth references are curated per task by domain experts.<a href="#section-3.3.1-1" class="pilcrow">¶</a></p>
-<div id="comparison-method">
-<section id="section-3.3.1.1">
-            <h5 id="name-comparison-method">
-<a href="#section-3.3.1.1" class="section-number selfRef">3.3.1.1. </a><a href="#name-comparison-method" class="section-name selfRef">Comparison Method</a>
-            </h5>
-<ol start="1" type="1" class="normal type-1" id="section-3.3.1.1-1">
-<li id="section-3.3.1.1-1.1">
-                <p id="section-3.3.1.1-1.1.1">Extract the set of commands actually applied by the agent from device running configurations (e.g., via <code>show running-config</code>).<a href="#section-3.3.1.1-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li id="section-3.3.1.1-1.2">
-                <p id="section-3.3.1.1-1.2.1">Normalize both the agent’s commands and the ground-truth commands by removing vendor-specific ordering differences and canonicalizing whitespace.<a href="#section-3.3.1.1-1.2.1" class="pilcrow">¶</a></p>
-</li>
-              <li id="section-3.3.1.1-1.3">
-                <p id="section-3.3.1.1-1.3.1">Use a diff-style tree comparison (similar to <code>ciscoconfparse</code>) to identify missing or extraneous commands.<a href="#section-3.3.1.1-1.3.1" class="pilcrow">¶</a></p>
-</li>
-            </ol>
-</section>
-</div>
-<div id="scoring">
-<section id="section-3.3.1.2">
-            <h5 id="name-scoring">
-<a href="#section-3.3.1.2" class="section-number selfRef">3.3.1.2. </a><a href="#name-scoring" class="section-name selfRef">Scoring</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.3.1.2-1.1">
-                <p id="section-3.3.1.2-1.1.1">Precision = (number of correct commands applied) / (number of total commands applied by agent)<a href="#section-3.3.1.2-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.3.1.2-1.2">
-                <p id="section-3.3.1.2-1.2.1">Recall = (number of correct commands applied) / (number of total ground-truth commands)<a href="#section-3.3.1.2-1.2.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-<p id="section-3.3.1.2-2">Configuration Accuracy Score =<a href="#section-3.3.1.2-2" class="pilcrow">¶</a></p>
-<p id="section-3.3.1.2-3"><code>
-2 × (Precision × Recall) / (Precision + Recall)
-</code><a href="#section-3.3.1.2-3" class="pilcrow">¶</a></p>
-<p id="section-3.3.1.2-4">Wildcard matching is applied for parameter values that can vary (e.g., automatically assigned AS numbers, dynamic interface indexes).<a href="#section-3.3.1.2-4" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="task-completion-rate">
-<section id="section-3.3.2">
-          <h4 id="name-task-completion-rate">
-<a href="#section-3.3.2" class="section-number selfRef">3.3.2. </a><a href="#name-task-completion-rate" class="section-name selfRef">Task Completion Rate</a>
-          </h4>
-<p id="section-3.3.2-1">Task Completion Rate measures the proportion of testcases passed after the agent’s final configuration is deployed. Each task includes a suite of device- and network-level testcases.<a href="#section-3.3.2-1" class="pilcrow">¶</a></p>
-<div id="passfail-criteria">
-<section id="section-3.3.2.1">
-            <h5 id="name-pass-fail-criteria">
-<a href="#section-3.3.2.1" class="section-number selfRef">3.3.2.1. </a><a href="#name-pass-fail-criteria" class="section-name selfRef">Pass/Fail Criteria</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.3.2.1-1.1">
-                <p id="section-3.3.2.1-1.1.1">Each testcase is marked PASS if the observed device or network state matches the expected state (e.g., ping success, BGP adjacency up, ACL enforced).<a href="#section-3.3.2.1-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.3.2.1-1.2">
-                <p id="section-3.3.2.1-1.2.1">FAIL if any discrepancy is detected (e.g., unreachable host, BGP neighbor not established).<a href="#section-3.3.2.1-1.2.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-<div id="score-calculation">
-<section id="section-3.3.2.2">
-            <h5 id="name-score-calculation">
-<a href="#section-3.3.2.2" class="section-number selfRef">3.3.2.2. </a><a href="#name-score-calculation" class="section-name selfRef">Score Calculation</a>
-            </h5>
-<p id="section-3.3.2.2-1">Task Completion Rate =<a href="#section-3.3.2.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.3.2.2-2"><code>
-(number of passed testcases) / (number of total testcases)
-</code><a href="#section-3.3.2.2-2" class="pilcrow">¶</a></p>
-<p id="section-3.3.2.2-3">A Task Completion Rate of 1.0 indicates that the agent’s configuration fully satisfies the intent’s functional requirements.<a href="#section-3.3.2.2-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="reasoning-consistency">
-<section id="section-3.3.3">
-          <h4 id="name-reasoning-consistency">
-<a href="#section-3.3.3" class="section-number selfRef">3.3.3. </a><a href="#name-reasoning-consistency" class="section-name selfRef">Reasoning Consistency</a>
-          </h4>
-<p id="section-3.3.3-1">Reasoning Consistency measures the semantic similarity between the agent’s reasoning trace (the internal “chain-of-thought” or planned steps) and a ground-truth reasoning outline prepared by experts.<a href="#section-3.3.3-1" class="pilcrow">¶</a></p>
-<div id="reasoning-extraction">
-<section id="section-3.3.3.1">
-            <h5 id="name-reasoning-extraction">
-<a href="#section-3.3.3.1" class="section-number selfRef">3.3.3.1. </a><a href="#name-reasoning-extraction" class="section-name selfRef">Reasoning Extraction</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.3.3.1-1.1">
-                <p id="section-3.3.3.1-1.1.1">For single-turn agents, the prompt must request an explicit rationale before issuing commands. The agent responds with two fields:<a href="#section-3.3.3.1-1.1.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-3.3.3.1-1.1.2">
-<li id="section-3.3.3.1-1.1.2.1">
-                    <p id="section-3.3.3.1-1.1.2.1.1">Reasoning (plaintext outline)<a href="#section-3.3.3.1-1.1.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                  <li id="section-3.3.3.1-1.1.2.2">
-                    <p id="section-3.3.3.1-1.1.2.2.1">Commands<a href="#section-3.3.3.1-1.1.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                </ol>
-</li>
-              <li class="normal" id="section-3.3.3.1-1.2">
-                <p id="section-3.3.3.1-1.2.1">For multi-turn (ReAct-style) agents, an auxiliary procedure concatenates interleaved “Thought” and “Action” steps into a unified reasoning narrative.<a href="#section-3.3.3.1-1.2.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-<div id="embedding-based-similarity">
-<section id="section-3.3.3.2">
-            <h5 id="name-embedding-based-similarity">
-<a href="#section-3.3.3.2" class="section-number selfRef">3.3.3.2. </a><a href="#name-embedding-based-similarity" class="section-name selfRef">Embedding-Based Similarity</a>
-            </h5>
-<ol start="1" type="1" class="normal type-1" id="section-3.3.3.2-1">
-<li id="section-3.3.3.2-1.1">
-                <p id="section-3.3.3.2-1.1.1">Encode both the agent’s reasoning and the ground-truth outline using a sentence embedding model.<a href="#section-3.3.3.2-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li id="section-3.3.3.2-1.2">
-                <p id="section-3.3.3.2-1.2.1">Compute cosine similarity to yield S_reason in the range [0,1].<a href="#section-3.3.3.2-1.2.1" class="pilcrow">¶</a></p>
-</li>
-              <li id="section-3.3.3.2-1.3">
-                <p id="section-3.3.3.2-1.3.1">If S_reason &lt; 0.7, mark “Low Reasoning Consistency” and log for further analysis.<a href="#section-3.3.3.2-1.3.1" class="pilcrow">¶</a></p>
-</li>
-            </ol>
-<p id="section-3.3.3.2-2">Because reasoning traces can vary in wording, embedding similarity is preferred to simple token-overlap.<a href="#section-3.3.3.2-2" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="interaction-efficiency">
-<section id="section-3.3.4">
-          <h4 id="name-interaction-efficiency">
-<a href="#section-3.3.4" class="section-number selfRef">3.3.4. </a><a href="#name-interaction-efficiency" class="section-name selfRef">Interaction Efficiency</a>
-          </h4>
-<p id="section-3.3.4-1">Interaction Efficiency quantifies how many interaction steps (API calls, command attempts, or clarification prompts) the agent needed to complete a task.<a href="#section-3.3.4-1" class="pilcrow">¶</a></p>
-<div id="metrics">
-<section id="section-3.3.4.1">
-            <h5 id="name-metrics">
-<a href="#section-3.3.4.1" class="section-number selfRef">3.3.4.1. </a><a href="#name-metrics" class="section-name selfRef">Metrics</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.3.4.1-1.1">
-                <p id="section-3.3.4.1-1.1.1">T_total = Total wall-clock time from task assignment to final configuration.<a href="#section-3.3.4.1-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.3.4.1-1.2">
-                <p id="section-3.3.4.1-1.2.1">N_actions = Number of <code>execute_cmd</code> or <code>update_cfg</code> calls made by the agent.<a href="#section-3.3.4.1-1.2.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.3.4.1-1.3">
-                <p id="section-3.3.4.1-1.3.1">N_queries = Number of state-query calls (e.g., <code>get_running_cfg</code>, <code>get_topology</code>).<a href="#section-3.3.4.1-1.3.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.3.4.1-1.4">
-                <p id="section-3.3.4.1-1.4.1">N_prompts = Number of clarification questions issued by the agent.<a href="#section-3.3.4.1-1.4.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-<div id="scoring-1">
-<section id="section-3.3.4.2">
-            <h5 id="name-scoring-2">
-<a href="#section-3.3.4.2" class="section-number selfRef">3.3.4.2. </a><a href="#name-scoring-2" class="section-name selfRef">Scoring</a>
-            </h5>
-<p id="section-3.3.4.2-1">The raw efficiency score is computed as:<a href="#section-3.3.4.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.3.4.2-2"><code>
-E_raw = α · T_total_norm + β · N_actions_norm + γ · N_queries_norm + δ · N_prompts_norm
-</code><a href="#section-3.3.4.2-2" class="pilcrow">¶</a></p>
-<p id="section-3.3.4.2-3">where:<a href="#section-3.3.4.2-3" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.3.4.2-4.1">
-                <p id="section-3.3.4.2-4.1.1"><code>T_total_norm = T_total / T_max</code><a href="#section-3.3.4.2-4.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.3.4.2-4.2">
-                <p id="section-3.3.4.2-4.2.1"><code>N_actions_norm = N_actions / A_max</code><a href="#section-3.3.4.2-4.2.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.3.4.2-4.3">
-                <p id="section-3.3.4.2-4.3.1"><code>N_queries_norm = N_queries / Q_max</code><a href="#section-3.3.4.2-4.3.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.3.4.2-4.4">
-                <p id="section-3.3.4.2-4.4.1"><code>N_prompts_norm = N_prompts / P_max</code>
-and α, β, γ, δ are weight factors (default α = 0.4, β = 0.3, γ = 0.2, δ = 0.1). Lower E_raw is more efficient. Then:<a href="#section-3.3.4.2-4.4.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-<p id="section-3.3.4.2-5"><code>
-Interaction Efficiency Score = 1 − E_raw  (clamped to [0,1])
-</code><a href="#section-3.3.4.2-5" class="pilcrow">¶</a></p>
-<p id="section-3.3.4.2-6">This composite metric balances speed, communication overhead, and human-agent clarifications.<a href="#section-3.3.4.2-6" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-</section>
-</div>
-<div id="agentenvironment-interaction-interface">
-<section id="section-3.4">
-        <h3 id="name-agentenvironment-interactio">
-<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-agentenvironment-interactio" class="section-name selfRef">Agent–Environment Interaction Interface</a>
-        </h3>
-<p id="section-3.4-1">IDNCEF specifies a minimal set of operations that every LLM agent <strong>MUST</strong> use to interact with the environment. The interface is vendor-agnostic.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
-<div id="primitive-actions">
-<section id="section-3.4.1">
-          <h4 id="name-primitive-actions">
-<a href="#section-3.4.1" class="section-number selfRef">3.4.1. </a><a href="#name-primitive-actions" class="section-name selfRef">Primitive Actions</a>
-          </h4>
-<p id="section-3.4.1-1">The following actions <strong>SHALL</strong> be supported by the environment and documented in an API specification.<a href="#section-3.4.1-1" class="pilcrow">¶</a></p>
-<div id="gettopology">
-<section id="section-3.4.1.1">
-            <h5 id="name-get_topology">
-<a href="#section-3.4.1.1" class="section-number selfRef">3.4.1.1. </a><a href="#name-get_topology" class="section-name selfRef">get_topology</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.4.1.1-1.1">
-                <p id="section-3.4.1.1-1.1.1"><strong>Input Parameters</strong>: List of device IDs (optional; if omitted, the entire topology is returned).<a href="#section-3.4.1.1-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.1.1-1.2">
-                <p id="section-3.4.1.1-1.2.1"><strong>Returns</strong>: Structured description of the requested devices and their neighbor links, including interface names, IP addresses, roles (switch/router/firewall), and current statuses (up/down).<a href="#section-3.4.1.1-1.2.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.1.1-1.3">
-                <p id="section-3.4.1.1-1.3.1"><strong>Usage</strong>:<a href="#section-3.4.1.1-1.3.1" class="pilcrow">¶</a></p>
-<p id="section-3.4.1.1-1.3.2"><code>
-Agent calls get_topology(['SW1','SW2']) to retrieve only switch-related links.
-</code><a href="#section-3.4.1.1-1.3.2" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-<div id="getrunningcfg">
-<section id="section-3.4.1.2">
-            <h5 id="name-get_running_cfg">
-<a href="#section-3.4.1.2" class="section-number selfRef">3.4.1.2. </a><a href="#name-get_running_cfg" class="section-name selfRef">get_running_cfg</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.4.1.2-1.1">
-                <p id="section-3.4.1.2-1.1.1"><strong>Input Parameters</strong>: Device ID string.<a href="#section-3.4.1.2-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.1.2-1.2">
-                <p id="section-3.4.1.2-1.2.1"><strong>Returns</strong>: The full running configuration text (or parsed JSON), including VLAN entries, routing processes, ACLs, QoS policies, etc.<a href="#section-3.4.1.2-1.2.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.1.2-1.3">
-                <p id="section-3.4.1.2-1.3.1"><strong>Usage</strong>:<a href="#section-3.4.1.2-1.3.1" class="pilcrow">¶</a></p>
-<p id="section-3.4.1.2-1.3.2"><code>
-Agent calls get_running_cfg('R3') to inspect current OSPF settings.
-</code><a href="#section-3.4.1.2-1.3.2" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-<div id="updatecfg">
-<section id="section-3.4.1.3">
-            <h5 id="name-update_cfg">
-<a href="#section-3.4.1.3" class="section-number selfRef">3.4.1.3. </a><a href="#name-update_cfg" class="section-name selfRef">update_cfg</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.4.1.3-1.1">
-                <p id="section-3.4.1.3-1.1.1"><strong>Input Parameters</strong>: Device ID, list of configuration commands.<a href="#section-3.4.1.3-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.1.3-1.2">
-                <p id="section-3.4.1.3-1.2.1"><strong>Returns</strong>: For each command, a status code (OK/ERROR) and error message (if any).<a href="#section-3.4.1.3-1.2.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.1.3-1.3">
-                <p id="section-3.4.1.3-1.3.1"><strong>Behavior</strong>: Applies commands in order. If a command fails (e.g., syntax error), it is marked ERROR and the next command is processed. The agent <strong>MUST</strong> handle partial failures by reissuing corrected commands or aborting.<a href="#section-3.4.1.3-1.3.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.1.3-1.4">
-                <p id="section-3.4.1.3-1.4.1"><strong>Usage</strong>:<a href="#section-3.4.1.3-1.4.1" class="pilcrow">¶</a></p>
-<p id="section-3.4.1.3-1.4.2"><code>
-Agent issues update_cfg('SW1', ['vlan 10 name Users', 'interface Gi1/0/1 switchport access vlan 10'])
-</code><a href="#section-3.4.1.3-1.4.2" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-<div id="executecmd">
-<section id="section-3.4.1.4">
-            <h5 id="name-execute_cmd">
-<a href="#section-3.4.1.4" class="section-number selfRef">3.4.1.4. </a><a href="#name-execute_cmd" class="section-name selfRef">execute_cmd</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.4.1.4-1.1">
-                <p id="section-3.4.1.4-1.1.1"><strong>Input Parameters</strong>: Device ID, single command string for status checks (e.g., "show ip route").<a href="#section-3.4.1.4-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.1.4-1.2">
-                <p id="section-3.4.1.4-1.2.1"><strong>Returns</strong>: The command’s text output or parsed data.<a href="#section-3.4.1.4-1.2.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.1.4-1.3">
-                <p id="section-3.4.1.4-1.3.1"><strong>Usage</strong>:<a href="#section-3.4.1.4-1.3.1" class="pilcrow">¶</a></p>
-<p id="section-3.4.1.4-1.3.2"><code>
-Agent invokes execute_cmd('FW1', 'show access-list OUT-TO-IN counters')
-</code><a href="#section-3.4.1.4-1.3.2" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-</section>
-</div>
-<div id="state-queries">
-<section id="section-3.4.2">
-          <h4 id="name-state-queries">
-<a href="#section-3.4.2" class="section-number selfRef">3.4.2. </a><a href="#name-state-queries" class="section-name selfRef">State Queries</a>
-          </h4>
-<p id="section-3.4.2-1">In addition to topology and configuration, the agent may need to retrieve dynamic state such as interface counters, routing tables, firewall flow logs, or BGP neighbor statuses. These can be obtained via <code>execute_cmd</code> or dedicated query actions:<a href="#section-3.4.2-1" class="pilcrow">¶</a></p>
-<div id="getinterfacestatus">
-<section id="section-3.4.2.1">
-            <h5 id="name-get_interface_status">
-<a href="#section-3.4.2.1" class="section-number selfRef">3.4.2.1. </a><a href="#name-get_interface_status" class="section-name selfRef">get_interface_status</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.4.2.1-1.1">
-                <p id="section-3.4.2.1-1.1.1"><strong>Input</strong>: Device ID, interface list (optional).<a href="#section-3.4.2.1-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.2.1-1.2">
-                <p id="section-3.4.2.1-1.2.1"><strong>Returns</strong>: Link status (up/down), speed, duplex, input/output counters, error counts.<a href="#section-3.4.2.1-1.2.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-<div id="getpolicystatus">
-<section id="section-3.4.2.2">
-            <h5 id="name-get_policy_status">
-<a href="#section-3.4.2.2" class="section-number selfRef">3.4.2.2. </a><a href="#name-get_policy_status" class="section-name selfRef">get_policy_status</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.4.2.2-1.1">
-                <p id="section-3.4.2.2-1.1.1"><strong>Input</strong>: Device ID, policy name (e.g., ACL or QoS policy).<a href="#section-3.4.2.2-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.2.2-1.2">
-                <p id="section-3.4.2.2-1.2.1"><strong>Returns</strong>: Summary of matches or drops (e.g., "ACL 101: 50 permits, 5 denies").<a href="#section-3.4.2.2-1.2.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-<div id="getospfsummary">
-<section id="section-3.4.2.3">
-            <h5 id="name-get_ospf_summary">
-<a href="#section-3.4.2.3" class="section-number selfRef">3.4.2.3. </a><a href="#name-get_ospf_summary" class="section-name selfRef">get_ospf_summary</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.4.2.3-1.1">
-                <p id="section-3.4.2.3-1.1.1"><strong>Input</strong>: Device ID.<a href="#section-3.4.2.3-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.2.3-1.2">
-                <p id="section-3.4.2.3-1.2.1"><strong>Returns</strong>: OSPF neighbor adjacency table, route summary, interface OSPF cost.<a href="#section-3.4.2.3-1.2.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-<div id="getbgpsummary">
-<section id="section-3.4.2.4">
-            <h5 id="name-get_bgp_summary">
-<a href="#section-3.4.2.4" class="section-number selfRef">3.4.2.4. </a><a href="#name-get_bgp_summary" class="section-name selfRef">get_bgp_summary</a>
-            </h5>
-<ul class="normal">
-<li class="normal" id="section-3.4.2.4-1.1">
-                <p id="section-3.4.2.4-1.1.1"><strong>Input</strong>: Device ID.<a href="#section-3.4.2.4-1.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.4.2.4-1.2">
-                <p id="section-3.4.2.4-1.2.1"><strong>Returns</strong>: BGP neighbor statuses, prefixes received, route-map hits.<a href="#section-3.4.2.4-1.2.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-3.4.2.4-2.1">
-                <p id="section-3.4.2.4-2.1.1">Note: The environment <strong>MAY</strong> expose other read-only queries. Agents <strong>SHOULD</strong> use the narrowest query consistent with need to reduce overhead.<a href="#section-3.4.2.4-2.1.1" class="pilcrow">¶</a></p>
-</li>
-            </ul>
-</section>
-</div>
-</section>
-</div>
-<div id="feedback-and-error-reporting">
-<section id="section-3.4.3">
-          <h4 id="name-feedback-and-error-reportin">
-<a href="#section-3.4.3" class="section-number selfRef">3.4.3. </a><a href="#name-feedback-and-error-reportin" class="section-name selfRef">Feedback and Error Reporting</a>
-          </h4>
-<p id="section-3.4.3-1">The environment <strong>MUST</strong> provide clear, structured feedback for <code>update_cfg</code> and <code>execute_cmd</code>:<a href="#section-3.4.3-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.4.3-2.1">
-              <p id="section-3.4.3-2.1.1">For <code>update_cfg</code>, each command returns:<a href="#section-3.4.3-2.1.1" class="pilcrow">¶</a></p>
-<p id="section-3.4.3-2.1.2"><code>
-{ "command": "...", "status": "OK" }
-</code><a href="#section-3.4.3-2.1.2" class="pilcrow">¶</a></p>
-<p id="section-3.4.3-2.1.3">
-or<a href="#section-3.4.3-2.1.3" class="pilcrow">¶</a></p>
-<p id="section-3.4.3-2.1.4"><code>
-{ "command": "...", "status": "ERROR", "error_msg": "&lt;description&gt;" }
-</code><a href="#section-3.4.3-2.1.4" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-3.4.3-2.2">
-              <p id="section-3.4.3-2.2.1">For <code>execute_cmd</code>, returns:<a href="#section-3.4.3-2.2.1" class="pilcrow">¶</a></p>
-<p id="section-3.4.3-2.2.2"><code>
-{ "output": "&lt;raw text&gt;", "parsed": { ... } }
-</code><a href="#section-3.4.3-2.2.2" class="pilcrow">¶</a></p>
-</li>
-          </ul>
-<p id="section-3.4.3-3">The agent <strong>SHOULD</strong> log all feedback to its reasoning trace. When a syntax or semantic error occurs, the agent <strong>MUST</strong> either:<a href="#section-3.4.3-3" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.4.3-4.1">
-              <p id="section-3.4.3-4.1.1">Attempt a correction (e.g., context switch for correct CLI mode), or<a href="#section-3.4.3-4.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-3.4.3-4.2">
-              <p id="section-3.4.3-4.2.1">Halt and record the failure for analysis (considered a FAIL for configuration accuracy).<a href="#section-3.4.3-4.2.1" class="pilcrow">¶</a></p>
-</li>
-          </ul>
-<p id="section-3.4.3-5">Agents <strong>MAY</strong> implement retry loops but <strong>SHOULD</strong> not exceed five retries per command.<a href="#section-3.4.3-5" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="extensibility-considerations">
-<section id="section-3.4.4">
-          <h4 id="name-extensibility-consideration">
-<a href="#section-3.4.4" class="section-number selfRef">3.4.4. </a><a href="#name-extensibility-consideration" class="section-name selfRef">Extensibility Considerations</a>
-          </h4>
-<p id="section-3.4.4-1">Although IDNCEF specifies a minimal core interface, implementations <strong>MAY</strong> extend it. Any additional actions or queries <strong>MUST</strong> be documented in the environment’s API. Agents <strong>SHOULD</strong> ignore unrecognized optional actions or fail if a required action is missing.<a href="#section-3.4.4-1" class="pilcrow">¶</a></p>
-<p id="section-3.4.4-2">Example extensions include:<a href="#section-3.4.4-2" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.4.4-3.1">
-              <p id="section-3.4.4-3.1.1">Automated knowledge retrieval: <code>search_command_manual(term)</code> to retrieve vendor CLI snippets.<a href="#section-3.4.4-3.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-3.4.4-3.2">
-              <p id="section-3.4.4-3.2.1">Real-time telemetry streaming: <code>subscribe_telemetry(stream_id)</code> for asynchronous interface counter updates.<a href="#section-3.4.4-3.2.1" class="pilcrow">¶</a></p>
-</li>
-          </ul>
-<p id="section-3.4.4-4">To maintain fairness, extended features <strong>SHOULD</strong> be disabled when comparing agents unless all agents under test share the same extensions.<a href="#section-3.4.4-4" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="example-workflow">
-<section id="section-3.5">
-        <h3 id="name-example-workflow">
-<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-example-workflow" class="section-name selfRef">Example Workflow</a>
-        </h3>
-<p id="section-3.5-1">This section outlines a sample end-to-end run for a complex policy optimization task. The agent uses single-turn reasoning with explicit chain-of-thought prompts.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
-<p id="section-3.5-2"><strong>Task Definition (Structured):</strong><a href="#section-3.5-2" class="pilcrow">¶</a></p>
-<p id="section-3.5-3"><code>jsonc
-{
-  "task_name": "Guest Traffic Isolation",
-  "devices": [
-    { "id": "SW4", "role": "access_switch" },
-    { "id": "SW5", "role": "access_switch" },
-    { "id": "FW2", "role": "firewall" }
-  ],
-  "topology": {
-    "links": [
-      { "endpoints": ["SW4","FW2"], "interfaces": ["SW4:Gi1/0/24","FW2:Gi0/1"] },
-      { "endpoints": ["SW5","FW2"], "interfaces": ["SW5:Gi1/0/24","FW2:Gi0/2"] }
-    ]
-  },
-  "intent": {
-    "type": "policy_optimization",
-    "description": "Enforce that VLAN 40 (Guest) on SW4 and SW5 can only access the Internet on TCP/80 and TCP/443, and cannot reach internal servers in VLAN 10.",
-    "parameters": {
-      "policy_domain": "access_control",
-      "criteria": {
-        "allow": ["any-&gt;any:TCP/80","any-&gt;any:TCP/443"],
-        "deny": ["10.0.10.0/24-&gt;10.0.10.0/24:any"]
-      },
-      "devices_involved": ["SW4","SW5","FW2"]
-    }
-  }
-}
-</code><a href="#section-3.5-3" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-3.5-4">
-<li id="section-3.5-4.1">
-            <p id="section-3.5-4.1.1">Agent reads structured task and calls <code>get_topology(None)</code> to fetch the entire topology. Receives JSON with two switch-to-firewall links.<a href="#section-3.5-4.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-3.5-4.2">
-            <p id="section-3.5-4.2.1">Agent extracts that VLAN 40 SVI must exist on SW4 and SW5. Calls <code>get_running_cfg("SW4")</code> and <code>get_running_cfg("SW5")</code>, finds no VLAN 40 configured.<a href="#section-3.5-4.2.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-3.5-4.3">
-            <p id="section-3.5-4.3.1">Constructs reasoning:<a href="#section-3.5-4.3.1" class="pilcrow">¶</a></p>
-<p id="section-3.5-4.3.2"><code>
-Create VLAN 40 on SW4 &amp; SW5, assign access ports for Guest.
-On FW2, create ACL "GUEST_OUT" permitting TCP/80 and TCP/443 for source 10.0.40.0/24, then deny other internal traffic (10.0.10.0/24). Apply NAT rule for Internet egress.
-Verify pings from VLAN 40 host to 8.8.8.8 and failure to 10.0.10.5.
-</code><a href="#section-3.5-4.3.2" class="pilcrow">¶</a></p>
-<p id="section-3.5-4.3.3">
-Logs the reasoning outline.<a href="#section-3.5-4.3.3" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-3.5-4.4">
-            <p id="section-3.5-4.4.1">Issues <code>update_cfg("SW4", ["vlan 40 name Guest", "interface Gi1/0/1 switchport access vlan 40", ...])</code>. Receives OK for each.<a href="#section-3.5-4.4.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-3.5-4.5">
-            <p id="section-3.5-4.5.1">Issues <code>update_cfg("SW5", ...)</code>. Receives OK.<a href="#section-3.5-4.5.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-3.5-4.6">
-            <p id="section-3.5-4.6.1">Calls <code>get_running_cfg("FW2")</code> to inspect existing ACLs. Finds none matching "Guest". Plans:<a href="#section-3.5-4.6.1" class="pilcrow">¶</a></p>
-<p id="section-3.5-4.6.2"><code>
-[
-  "ip access-list extended GUEST_OUT",
-  " permit tcp 10.0.40.0 0.0.0.255 any eq 80",
-  " permit tcp 10.0.40.0 0.0.0.255 any eq 443",
-  " deny ip 10.0.40.0 0.0.0.255 10.0.10.0 0.0.0.255",
-  " permit ip any any"
-]
-</code><a href="#section-3.5-4.6.2" class="pilcrow">¶</a></p>
-<p id="section-3.5-4.6.3">
-Issues <code>update_cfg("FW2", ...)</code>. Receives OK.<a href="#section-3.5-4.6.3" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-3.5-4.7">
-            <p id="section-3.5-4.7.1">Calls <code>execute_cmd("FW2", "show access-list GUEST_OUT")</code> to verify counters are zero initially.<a href="#section-3.5-4.7.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-3.5-4.8">
-            <p id="section-3.5-4.8.1">Simulates test traffic: Agent issues <code>execute_cmd("SW4", "ping 8.8.8.8 source 10.0.40.10 repeat 5")</code>. Observes 5/5 success.<a href="#section-3.5-4.8.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-3.5-4.9">
-            <p id="section-3.5-4.9.1">Agent issues <code>execute_cmd("SW4", "ping 10.0.10.5 source 10.0.40.10 repeat 5")</code>, observes 0/5 success.<a href="#section-3.5-4.9.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-3.5-4.10">
-            <p id="section-3.5-4.10.1">Reasoning trace completed. Agent returns final configuration and a summary:<a href="#section-3.5-4.10.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.5-4.10.2.1">
-                <p id="section-3.5-4.10.2.1.1">Task Completion Rate = 1.0<a href="#section-3.5-4.10.2.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.5-4.10.2.2">
-                <p id="section-3.5-4.10.2.2.1">S_reason = 0.92 (cosine similarity with ground-truth outline)<a href="#section-3.5-4.10.2.2.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.5-4.10.2.3">
-                <p id="section-3.5-4.10.2.3.1">S_command = 0.95<a href="#section-3.5-4.10.2.3.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="normal" id="section-3.5-4.10.2.4">
-                <p id="section-3.5-4.10.2.4.1">E_raw = 0.18 -&gt; Efficiency = 0.82<a href="#section-3.5-4.10.2.4.1" class="pilcrow">¶</a></p>
+                </ul>
 </li>
             </ul>
 </li>
         </ol>
-<p id="section-3.5-5">This workflow demonstrates how IDNCEF’s components work together for a complex multi-device policy task.<a href="#section-3.5-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="workflow">
+<section id="section-3.2">
+        <h3 id="name-workflow">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-workflow" class="section-name selfRef">Workflow</a>
+        </h3>
+<p id="section-3.2-1">The evaluation workflow for each task proceeds through six stages:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.2-2">
+<li id="section-3.2-2.1">
+            <p id="section-3.2-2.1.1"><strong>Task Assignment</strong><br>
+NetConfBench selects a task from the JSON dataset and provides only the high-level intent(s) to the LLM agent.<a href="#section-3.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.2-2.2">
+            <p id="section-3.2-2.2.1"><strong>Environment Setup</strong><br>
+The framework instantiates a GNS3 topology based on the task’s <code>topology</code> and applies the <code>startup-config</code> to each device.  Once the emulated network reaches a stable state, control transfers to the agent.<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.2-2.3">
+            <p id="section-3.2-2.3.1"><strong>Interactive Execution</strong><br>
+The LLM agent receives the partial prompt containing:<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-2.3.2.1">
+                <p id="section-3.2-2.3.2.1.1">The API specification for <code>get-topology</code>, <code>get-running-cfg</code>, <code>update-cfg</code>, and <code>execute-cmd</code>.<a href="#section-3.2-2.3.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.2-2.3.2.2">
+                <p id="section-3.2-2.3.2.2.1">The natural language intent.<a href="#section-3.2-2.3.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.2-2.3.2.3">
+                <p id="section-3.2-2.3.2.3.1">(Optionally) Device model/version hints.<br>
+The agent issues a sequence of API calls; for single-turn agents, it outputs reasoning followed by a batch of CLI commands.  For multi-turn agents, it alternates reasoning traces and API calls.<a href="#section-3.2-2.3.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li id="section-3.2-2.4">
+            <p id="section-3.2-2.4.1"><strong>Reasoning Trajectory Export</strong><br>
+After execution completes (agent signals “task done” or after a predefined command budget), NetConfBench captures the entire reasoning log:<a href="#section-3.2-2.4.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-2.4.2.1">
+                <p id="section-3.2-2.4.2.1.1">For single-turn: the reasoning paragraph embedded in the LLM’s output.<a href="#section-3.2-2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.2-2.4.2.2">
+                <p id="section-3.2-2.4.2.2.1">For ReAct: an auxiliary summarization LLM condenses the interleaved reasoning and actions into a single coherent trace.<a href="#section-3.2-2.4.2.2.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li id="section-3.2-2.5">
+            <p id="section-3.2-2.5.1"><strong>Final Configuration Export</strong><br>
+The framework uses the Task Evaluation Interface to extract the final running configs from each device.<a href="#section-3.2-2.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-3.2-2.6">
+            <p id="section-3.2-2.6.1"><strong>Testcase Execution and Scoring</strong><a href="#section-3.2-2.6.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-2.6.2.1">
+                <p id="section-3.2-2.6.2.1.1"><strong>Command Score:</strong> Hierarchical diff against ground truth commands.<a href="#section-3.2-2.6.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.2-2.6.2.2">
+                <p id="section-3.2-2.6.2.2.1"><strong>Testcase Score:</strong> Execute each testcase in sequence; record pass/fail.<a href="#section-3.2-2.6.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.2-2.6.2.3">
+                <p id="section-3.2-2.6.2.3.1"><strong>Reasoning Score:</strong> Compute embedding similarity between the agent’s reasoning trace and ground truth reasoning.<a href="#section-3.2-2.6.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+        </ol>
+<p id="section-3.2-3">The final per-task score is typically reported as a tuple <code>(S_reasoning, S_command, S_testcase)</code>.  Aggregate results across the forty tasks enable comparisons among LLMs and interaction strategies.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="data-model">
+<section id="section-4">
+      <h2 id="name-data-model">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-data-model" class="section-name selfRef">Data Model</a>
+      </h2>
+<p id="section-4-1">This section specifies the JSON schemas and interface conventions used to represent tasks and to enable structured interaction between the LLM agent and the emulated environment.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<div id="task-definition-schema">
+<section id="section-4.1">
+        <h3 id="name-task-definition-schema">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-task-definition-schema" class="section-name selfRef">Task Definition Schema</a>
+        </h3>
+<p id="section-4.1-1">Each configuration task is defined as a JSON object with the following structure:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-4.1-2">
+<pre>
+{
+  "task_name": "Static Routing",
+  "intents": [
+    "NewYork: create a static route pointing to the Loopback0 on
+    Washington, traffic should pass the 192.168.1.0 network.",
+    "NewYork: create a backup static route pointing to the Loopback0
+    on Washington, administrative distance should be 100."
+    ...
+  ],
+  "topology": {
+    "nodes": ["NewYork", "Washington"],
+    "links": [
+      "NewYork S0/0 &lt;-&gt; Washington S0/0 ",
+      "NewYork S0/1 &lt;-&gt; Washington S0/1"
+    ]
+  },
+  "startup_configs": {
+    "NewYork": "!\r\nversion 12.4\r\nservice timestamps
+    debug datetime msec\r\n...",
+    "Washington": "!\r\nversion 12.4\r\nservice timestamps
+    debug datetime msec\r\n...",
+  },
+  "ground_truth_configs": {
+    "NewYork": [
+      "ip route 2.2.2.0 255.255.255.252 192.168.1.2",
+      "ip route 2.2.2.0 255.255.255.252 192.168.2.2 100"
+    ],
+    ...
+  },
+  "ground_truth_reasoning": "NewYork to Washington Loopback
+  (primary path): add a static route for Washington's
+  Loopback0 network (2.2.2.0/30) pointing to the
+  next-hop 192.168.1.2...",
+  "testcases": [
+    {
+      "name": "Static Route from NewYork to Washington",
+      "expected_result": {
+        "protocol": "static",
+        "next_hop": "192.168.1.2"
+      }
+    },
+    ...
+  ]
+}
+</pre><a href="#section-4.1-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="agent-network-interface-ani">
+<section id="section-4.2">
+        <h3 id="name-agent-network-interface-ani">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-agent-network-interface-ani" class="section-name selfRef">Agent-Network Interface (ANI)</a>
+        </h3>
+<p id="section-4.2-1">The Agent-Network Interface defines the minimal API primitives necessary for intent-driven configuration.  Each primitive uses JSON-RPC style request/response with the following methods:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.2-2">
+<li id="section-4.2-2.1">
+            <p id="section-4.2-2.1.1"><strong><code>get-topology</code></strong><a href="#section-4.2-2.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2-2.1.2.1">
+                <p id="section-4.2-2.1.2.1.1"><strong>Request</strong>:<br>
+                  <code>json
+{
+  "method": "get-topology",
+  "params": {
+    "devices": ["R1", "R2", ...]
+  }
+}
+</code><a href="#section-4.2-2.1.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.2-2.1.2.2">
+                <p id="section-4.2-2.1.2.2.1"><strong>Response</strong>:<br>
+                  <code>json
+{
+  "topology": {
+    "nodes": [...],
+    "links": [...]
+  }
+}
+</code><a href="#section-4.2-2.1.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.2-2.1.2.3">
+                <p id="section-4.2-2.1.2.3.1"><strong>Description</strong>: Returns the full topology for the specified subset of devices.  If <code>"devices"</code> is empty or omitted, returns the entire topology.<a href="#section-4.2-2.1.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li id="section-4.2-2.2">
+            <p id="section-4.2-2.2.1"><strong><code>get-running-cfg</code></strong><a href="#section-4.2-2.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2-2.2.2.1">
+                <p id="section-4.2-2.2.2.1.1"><strong>Request</strong>:<br>
+                  <code>json
+{
+  "method": "get-running-cfg",
+  "params": {
+    "device": "R1"
+  }
+}
+</code><a href="#section-4.2-2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.2-2.2.2.2">
+                <p id="section-4.2-2.2.2.2.1"><strong>Response</strong>:<br>
+                  <code>json
+{
+  "running_config": "interface Gig0/0\n ip address 192.168.1.1 255.255.255.252\n..."
+}
+</code><a href="#section-4.2-2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.2-2.2.2.3">
+                <p id="section-4.2-2.2.2.3.1"><strong>Description</strong>: Retrieves the active (running) configuration of the specified device.<a href="#section-4.2-2.2.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li id="section-4.2-2.3">
+            <p id="section-4.2-2.3.1"><strong><code>update-cfg</code></strong><a href="#section-4.2-2.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2-2.3.2.1">
+                <p id="section-4.2-2.3.2.1.1"><strong>Request</strong>:<br>
+                  <code>json
+{
+  "method": "update-cfg",
+  "params": {
+    "device": "R1",
+    "commands": [
+      "configure terminal",
+      "ip route 2.2.2.0 255.255.255.252 192.168.1.2"
+    ]
+  }
+}
+</code><a href="#section-4.2-2.3.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.2-2.3.2.2">
+                <p id="section-4.2-2.3.2.2.1"><strong>Response</strong>:<br>
+                  <code>json
+{
+  "results": [
+    { "command": "configure terminal", "status": "success" },
+    { "command": "ip route 2.2.2.0 255.255.255.252 192.168.1.2", "status": "success" }
+  ]
+}
+</code><a href="#section-4.2-2.3.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.2-2.3.2.3">
+                <p id="section-4.2-2.3.2.3.1"><strong>Description</strong>: Applies a sequence of CLI commands to the specified device.  Returns per-command status and any error messages.<a href="#section-4.2-2.3.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li id="section-4.2-2.4">
+            <p id="section-4.2-2.4.1"><strong><code>execute-cmd</code></strong><a href="#section-4.2-2.4.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2-2.4.2.1">
+                <p id="section-4.2-2.4.2.1.1"><strong>Request</strong>:<br>
+                  <code>json
+{
+  "method": "execute-cmd",
+  "params": {
+    "device": "R1",
+    "command": "show ip route 2.2.2.0 255.255.255.252"
+  }
+}
+</code><a href="#section-4.2-2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.2-2.4.2.2">
+                <p id="section-4.2-2.4.2.2.1"><strong>Response</strong>:<br>
+                  <code>json
+{
+  "output": "S 2.2.2.0/30 [1/0] via 192.168.1.2"
+}
+</code><a href="#section-4.2-2.4.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.2-2.4.2.3">
+                <p id="section-4.2-2.4.2.3.1"><strong>Description</strong>: Executes a read-only command on the specified device and returns its output.  Must not alter device state.<a href="#section-4.2-2.4.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+        </ol>
+</section>
+</div>
+<div id="task-evaluation-interface">
+<section id="section-4.3">
+        <h3 id="name-task-evaluation-interface">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-task-evaluation-interface" class="section-name selfRef">Task Evaluation Interface</a>
+        </h3>
+<p id="section-4.3-1">After the agent signals completion, the framework uses the Task Evaluation Interface to retrieve results:<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.3-2.1">
+            <p id="section-4.3-2.1.1"><strong><code>export-final-cfg</code></strong><a href="#section-4.3-2.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.3-2.1.2.1">
+                <p id="section-4.3-2.1.2.1.1"><strong>Request</strong>:<br>
+                  <code>json
+{
+  "method": "export-final-cfg"
+}
+</code><a href="#section-4.3-2.1.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.3-2.1.2.2">
+                <p id="section-4.3-2.1.2.2.1"><strong>Response</strong>:<br>
+                  <code>json
+{
+  "configs": {
+    "R1": "!\nversion 15.2\n...",
+    "R2": "!\nversion 15.2\n..."
+  }
+}
+</code><a href="#section-4.3-2.1.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.3-2.1.2.3">
+                <p id="section-4.3-2.1.2.3.1"><strong>Description</strong>: Returns the final running-configuration of each device.<a href="#section-4.3-2.1.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li class="normal" id="section-4.3-2.2">
+            <p id="section-4.3-2.2.1"><strong><code>run-testcases</code></strong><a href="#section-4.3-2.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.3-2.2.2.1">
+                <p id="section-4.3-2.2.2.1.1"><strong>Request</strong>:<br>
+                  <code>json
+{
+  "method": "run-testcases",
+  "params": {
+    "testcases": [
+      {
+        "device": "R1",
+        "commands": ["show ip route 2.2.2.0 255.255.255.252"],
+        "expected_output": "S 2.2.2.0/30 [1/0] via 192.168.1.2"
+      },
+      ...
+    ]
+  }
+}
+</code><a href="#section-4.3-2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.3-2.2.2.2">
+                <p id="section-4.3-2.2.2.2.1"><strong>Response</strong>:<br>
+                  <code>json
+{
+  "results": [
+    { "name": "Verify primary static route on R1", "status": "pass" },
+    { "name": "Verify backup static route on R1", "status": "fail" }
+  ]
+}
+</code><a href="#section-4.3-2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-4.3-2.2.2.3">
+                <p id="section-4.3-2.2.2.3.1"><strong>Description</strong>: Executes each verification command sequence on the appropriate device and compares actual output against <code>expected_output</code> (regular expression).  Returns pass/fail for each testcase.<a href="#section-4.3-2.2.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+        </ul>
+</section>
+</div>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-3.6">
-        <h3 id="name-security-considerations">
-<a href="#section-3.6" class="section-number selfRef">3.6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
-        </h3>
-<p id="section-3.6-1">This framework does not introduce new protocols that carry security implications. However, when agents fetch sensitive configuration (e.g., firewall policies, BGP passwords) via <code>get_running_cfg</code>, care <strong>SHOULD</strong> be taken to secure the control channel. All agent–environment interactions <strong>SHOULD</strong> be performed over TLS or an equivalent secure channel to avoid credential leakage. Agents <strong>MUST</strong> sanitize any user-provided intents to guard against injection attacks (e.g., <code>"ip access-list permit ip any any; no logging"</code>).<a href="#section-3.6-1" class="pilcrow">¶</a></p>
-<p id="section-3.6-2">Additionally, agent logic that retries failing commands could be abused to launch denial-of-service against emulated devices if not properly rate-limited. Emulated environments <strong>SHOULD</strong> implement control message rate limiting during benchmarking to avoid infinite loops. Ground-truth reasoning outlines contain proprietary design information and <strong>SHOULD</strong> be stored securely and not published outside test teams.<a href="#section-3.6-2" class="pilcrow">¶</a></p>
-</section>
-</div>
+<section id="section-5">
+      <h2 id="name-security-considerations">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-5-1">LLM-driven network configuration introduces risks such as unintended or malicious commands, emulator vulnerabilities, and data exposure; to mitigate these, NetConfBench should enforce strict input validation (e.g., YANG/XML schema checks), run emulated devices in isolated sandboxes with limited privileges, encrypt and restrict access to task definitions and logs, employ human-in-the-loop approval for generated configurations, and use curated prompt templates and fine-tuning to reduce LLM hallucinations.<a href="#section-5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-4">
+<section id="section-6">
       <h2 id="name-iana-considerations">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-4-1">This document has no IANA actions.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-6-1">This document has no IANA actions.<a href="#section-6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-combined-references">
-<section id="section-5">
+<section id="section-7">
       <h2 id="name-references">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
 <div id="sec-normative-references">
-<section id="section-5.1">
+<section id="section-7.1">
         <h3 id="name-normative-references">
-<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="RFC6241">[RFC6241]</dt>
         <dd>
 <span class="refAuthor">Enns, R., Ed.</span>, <span class="refAuthor">Bjorklund, M., Ed.</span>, <span class="refAuthor">Schoenwaelder, J., Ed.</span>, and <span class="refAuthor">A. Bierman, Ed.</span>, <span class="refTitle">"Network Configuration Protocol (NETCONF)"</span>, <span class="seriesInfo">RFC 6241</span>, <span class="seriesInfo">DOI 10.17487/RFC6241</span>, <time datetime="2011-06" class="refDate">June 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6241">https://www.rfc-editor.org/rfc/rfc6241</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC8341">[RFC8341]</dt>
+<dt id="RFC7950">[RFC7950]</dt>
       <dd>
-<span class="refAuthor">Bierman, A.</span> and <span class="refAuthor">M. Bjorklund</span>, <span class="refTitle">"Network Configuration Access Control Model"</span>, <span class="seriesInfo">STD 91</span>, <span class="seriesInfo">RFC 8341</span>, <span class="seriesInfo">DOI 10.17487/RFC8341</span>, <time datetime="2018-03" class="refDate">March 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8341">https://www.rfc-editor.org/rfc/rfc8341</a>&gt;</span>. </dd>
+<span class="refAuthor">Bjorklund, M., Ed.</span>, <span class="refTitle">"The YANG 1.1 Data Modeling Language"</span>, <span class="seriesInfo">RFC 7950</span>, <span class="seriesInfo">DOI 10.17487/RFC7950</span>, <time datetime="2016-08" class="refDate">August 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7950">https://www.rfc-editor.org/rfc/rfc7950</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-5.2">
+<section id="section-7.2">
         <h3 id="name-informative-references">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
-<dt id="Hu22">[Hu22]</dt>
+<dt id="A2023">[A2023]</dt>
         <dd>
-<span class="refAuthor">Hu, E. J.</span>, <span class="refAuthor">Shen, Y.</span>, <span class="refAuthor">Wallis, P.</span>, <span class="refAuthor">Allen-Zhu, Z.</span>, <span class="refAuthor">Li, Y.</span>, <span class="refAuthor">Wang, S.</span>, <span class="refAuthor">Wang, L.</span>, and <span class="refAuthor">W. Chen</span>, <span class="refTitle">"LoRA Low-Rank Adaptation of Large Language Models"</span>, <span>n.d.</span>. </dd>
+<span class="refAuthor">Hat, R.</span>, <span class="refTitle">"Ansible"</span>, <time datetime="2023" class="refDate">2023</time>. </dd>
 <dd class="break"></dd>
-<dt id="Huang25">[Huang25]</dt>
+<dt id="Fuad2024">[Fuad2024]</dt>
         <dd>
-<span class="refAuthor">Huang,, L.</span>, <span class="refAuthor">Yu, W.</span>, <span class="refAuthor">Ma, W.</span>, <span class="refAuthor">Zhong, W.</span>, <span class="refAuthor">Feng, Z.</span>, <span class="refAuthor">Wang, H.</span>, <span class="refAuthor">Chen, Q.</span>, <span class="refAuthor">Peng, W.</span>, <span class="refAuthor">Feng, X.</span>, <span class="refAuthor">Qin, B.</span>, and <span class="refAuthor">T. Liu</span>, <span class="refTitle">"A Survey on Hallucination in Large Language Models Principles, Taxonomy, Challenges, and Open Questions"</span>, <span>n.d.</span>. </dd>
+<span class="refAuthor">Fuad, A.</span>, <span class="refAuthor">Ahmed, A. H.</span>, <span class="refAuthor">Riegler, M. A.</span>, and <span class="refAuthor">T. Cicic</span>, <span class="refTitle">"An intent-based networks framework based on large language models"</span>, <time datetime="2024" class="refDate">2024</time>. </dd>
 <dd class="break"></dd>
-<dt id="Lewis20">[Lewis20]</dt>
+<dt id="Kreutz2014">[Kreutz2014]</dt>
         <dd>
-<span class="refAuthor">Lewis, P.</span>, <span class="refAuthor">Perez, E.</span>, <span class="refAuthor">Piktus, A.</span>, <span class="refAuthor">Petroni, F.</span>, <span class="refAuthor">Karpukhin, V.</span>, <span class="refAuthor">Goyal, N.</span>, <span class="refAuthor">Küttler, H.</span>, <span class="refAuthor">Lewis, M.</span>, <span class="refAuthor">Yih, W.-t.</span>, <span class="refAuthor">Rocktäschel, T.</span>, and <span class="refAuthor">S. Riede</span>, <span class="refTitle">"Retrieval-augmented generation for knowledge-intensive NLP tasks"</span>, <span>n.d.</span>. </dd>
+<span class="refAuthor">Kreutz, D.</span>, <span class="refAuthor">Ramos, F. M. V.</span>, <span class="refAuthor">Verissimo, P. E.</span>, <span class="refAuthor">Rothenberg, C. E.</span>, <span class="refAuthor">Azodolmolky, S.</span>, and <span class="refAuthor">S. Uhlig</span>, <span class="refTitle">"Software-defined networking: A comprehensive survey"</span>, <time datetime="2014" class="refDate">2014</time>. </dd>
 <dd class="break"></dd>
-<dt id="TM-IG1230">[TM-IG1230]</dt>
+<dt id="Lira2024">[Lira2024]</dt>
+        <dd>
+<span class="refAuthor">Lira, O. G.</span>, <span class="refAuthor">Caicedo, O. M.</span>, and <span class="refAuthor">N. L. S. da. Fonseca</span>, <span class="refTitle">"Large language models for zero touch network configuration management"</span>, <time datetime="2024" class="refDate">2024</time>. </dd>
+<dd class="break"></dd>
+<dt id="Liu2024">[Liu2024]</dt>
+        <dd>
+<span class="refAuthor">Liu, C.</span>, <span class="refAuthor">Xie, X.</span>, <span class="refAuthor">Zhang, X.</span>, and <span class="refAuthor">Y. Cui</span>, <span class="refTitle">"Large language models for networking: Workflow, advances and challenges"</span>, <time datetime="2024" class="refDate">2024</time>. </dd>
+<dd class="break"></dd>
+<dt id="Long2025">[Long2025]</dt>
+        <dd>
+<span class="refAuthor">Long, S.</span>, <span class="refAuthor">Tan, J.</span>, <span class="refAuthor">Mao, B.</span>, <span class="refAuthor">Tang, F.</span>, <span class="refAuthor">Li, Y.</span>, <span class="refAuthor">Zhao, M.</span>, and <span class="refAuthor">N. Kato</span>, <span class="refTitle">"A Survey on Intelligent Network Operations and Performance Optimization Based on Large Language Models"</span>, <time datetime="2025" class="refDate">2025</time>. </dd>
+<dd class="break"></dd>
+<dt id="Wang2024NetConfEval">[Wang2024NetConfEval]</dt>
       <dd>
-<span class="refAuthor">McDonnell, K.</span>, <span class="refAuthor">Machwe, A.</span>, <span class="refAuthor">Milham, D.</span>, <span class="refAuthor">O’Sullivan, J.</span>, <span class="refAuthor">Niemöller, J.</span>, <span class="refAuthor">Varvello, L. F.</span>, <span class="refAuthor">Devadatta, V.</span>, <span class="refAuthor">Lei, W.</span>, <span class="refAuthor">Xu, W.</span>, <span class="refAuthor">Yuan, X.</span>, and <span class="refAuthor">Y. Stein</span>, <span class="refTitle">"Autonomous Networks Technical Architecture"</span>, <time datetime="2023-02" class="refDate">February 2023</time>. </dd>
+<span class="refAuthor">Wang, C.</span>, <span class="refAuthor">Scazzariello, M.</span>, <span class="refAuthor">Farshin, A.</span>, <span class="refAuthor">Ferlin, S.</span>, <span class="refAuthor">Kostic, D.</span>, and <span class="refAuthor">M. Chiesa</span>, <span class="refTitle">"Netconfeval: Can llms facilitate network configuration?"</span>, <time datetime="2024" class="refDate">2024</time>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -2301,7 +1888,19 @@ Issues <code>update_cfg("FW2", ...)</code>. Receives OK.<a href="#section-3.5-4.
 <div dir="auto" class="left"><span class="country-name">China</span></div>
 <div class="email">
 <span>Email:</span>
-<a href="mailto:liuchang@tsinghua.edu.cn" class="email">liuchang@tsinghua.edu.cn</a>
+<a href="mailto:liuchang23@mails.tsinghua.edu.cn" class="email">liuchang23@mails.tsinghua.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Xiaohui Xie</span></div>
+<div dir="auto" class="left"><span class="org">Tsinghua University</span></div>
+<div dir="auto" class="left">
+<span class="region">Beijing</span>, <span class="postal-code">100084</span>
+</div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:xiexiaohui@tsinghua.edu.cn" class="email">xiexiaohui@tsinghua.edu.cn</a>
 </div>
 </address>
 <address class="vcard">
