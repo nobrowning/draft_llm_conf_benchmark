@@ -374,48 +374,57 @@ Each configuration task is defined as a JSON object with the following structure
 
 The Agent-Network Interface defines the minimal API primitives necessary for intent-driven configuration.  Each primitive uses JSON-RPC style request/response with the following methods:
 
-1. **`get-topology`**  
-   - **Request**:  
-     ```json
+1. **`get-topology`**
+   - **Request**:
+
+     ~~~ json
      {
        "method": "get-topology",
        "params": {
          "devices": ["R1", "R2", ...]
        }
      }
-     ```  
+     ~~~ 
+    
    - **Response**:  
-     ```json
+
+     ~~~ json
      {
        "topology": {
          "nodes": [...],
          "links": [...]
        }
      }
-     ```  
+     ~~~
+    
    - **Description**: Returns the full topology for the specified subset of devices.  If `"devices"` is empty or omitted, returns the entire topology.
 
 2. **`get-running-cfg`**  
-   - **Request**:  
-     ```json
+   - **Request**:
+
+     ~~~ json
      {
        "method": "get-running-cfg",
        "params": {
          "device": "R1"
        }
      }
-     ```  
+     ~~~
+
    - **Response**:  
-     ```json
+
+     ~~~ json
      {
        "running_config": "interface Gig0/0\n ip address 192.168.1.1 255.255.255.252\n..."
      }
-     ```  
+     ~~~
+    
    - **Description**: Retrieves the active (running) configuration of the specified device.
 
 3. **`update-cfg`**  
-   - **Request**:  
-     ```json
+   - **Request**:
+
+     ~~~ json
      {
        "method": "update-cfg",
        "params": {
@@ -426,21 +435,25 @@ The Agent-Network Interface defines the minimal API primitives necessary for int
          ]
        }
      }
-     ```  
-   - **Response**:  
-     ```json
+     ~~~
+     
+   - **Response**:
+
+     ~~~ json
      {
        "results": [
          { "command": "configure terminal", "status": "success" },
          { "command": "ip route 2.2.2.0 255.255.255.252 192.168.1.2", "status": "success" }
        ]
      }
-     ```  
+     ~~~
+      
    - **Description**: Applies a sequence of CLI commands to the specified device.  Returns per-command status and any error messages.
 
 4. **`execute-cmd`**  
-   - **Request**:  
-     ```json
+   - **Request**:
+
+     ~~~ json
      {
        "method": "execute-cmd",
        "params": {
@@ -448,13 +461,16 @@ The Agent-Network Interface defines the minimal API primitives necessary for int
          "command": "show ip route 2.2.2.0 255.255.255.252"
        }
      }
-     ```  
-   - **Response**:  
-     ```json
+     ~~~
+    
+   - **Response**:
+
+     ~~~ json
      {
        "output": "S 2.2.2.0/30 [1/0] via 192.168.1.2"
      }
-     ```  
+     ~~~
+    
    - **Description**: Executes a read-only command on the specified device and returns its output.  Must not alter device state.
 
 ## Task Evaluation Interface
@@ -462,26 +478,31 @@ The Agent-Network Interface defines the minimal API primitives necessary for int
 After the agent signals completion, the framework uses the Task Evaluation Interface to retrieve results:
 
 - **`export-final-cfg`**  
-  - **Request**:  
-    ```json
+  - **Request**:
+
+    ~~~ json
     {
       "method": "export-final-cfg"
     }
-    ```  
-  - **Response**:  
-    ```json
+    ~~~
+   
+  - **Response**:
+
+    ~~~ json
     {
       "configs": {
         "R1": "!\nversion 15.2\n...",
         "R2": "!\nversion 15.2\n..."
       }
     }
-    ```  
+    ~~~
+  
   - **Description**: Returns the final running-configuration of each device.
 
 - **`run-testcases`**  
-  - **Request**:  
-    ```json
+  - **Request**:
+
+    ~~~ json
     {
       "method": "run-testcases",
       "params": {
@@ -495,16 +516,19 @@ After the agent signals completion, the framework uses the Task Evaluation Inter
         ]
       }
     }
-    ```  
-  - **Response**:  
-    ```json
+    ~~~
+  
+  - **Response**:
+
+    ~~~ json
     {
       "results": [
         { "name": "Verify primary static route on R1", "status": "pass" },
         { "name": "Verify backup static route on R1", "status": "fail" }
       ]
     }
-    ```  
+    ~~~
+    
   - **Description**: Executes each verification command sequence on the appropriate device and compares actual output against `expected_output` (regular expression).  Returns pass/fail for each testcase.
 
 # Security Considerations
