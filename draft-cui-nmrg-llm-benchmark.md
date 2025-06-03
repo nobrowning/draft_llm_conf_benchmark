@@ -95,22 +95,22 @@ normative:
   RFC7950:
 informative:
   Kreutz2014:
-    title: Software-defined networking: A comprehensive survey
+    title: "Software-defined networking: A comprehensive survey"
     author:
     - name: Diego Kreutz
     - name: Fernando M. V. Ramos
-    - name: Paulo Esteves Veríssimo
+    - name: Paulo Esteves Verissimo
     - name: Christian Esteve Rothenberg
     - name: Siamak Azodolmolky
     - name: Steve Uhlig
     date: 2014
-  Ansible2023:
+  A2023:
     title: Ansible
     author:
     - name: Red Hat
     date: 2023
   Long2025:
-    title: A Survey on Intelligent Network Operations and Performance Optimization Based on Large Language Models
+    title: "A Survey on Intelligent Network Operations and Performance Optimization Based on Large Language Models"
     author:
     - name: Sifan Long
     - name: Jingjing Tan
@@ -121,7 +121,7 @@ informative:
     - name: Nei Kato
     date: 2025
   Liu2024:
-    title: Large language models for networking: Workflow, advances and challenges
+    title: "Large language models for networking: Workflow, advances and challenges"
     author:
     - name: Chang Liu
     - name: Xiaohui Xie
@@ -129,32 +129,31 @@ informative:
     - name: Yong Cui
     date: 2024
   Fuad2024:
-    title: An intent-based networks framework based on large language models
+    title: "An intent-based networks framework based on large language models"
     author:
     - name: Ahlam Fuad
     - name: Azza H. Ahmed
     - name: Michael A. Riegler
-    - name: Tarik Čičić
+    - name: Tarik Cicic
     date: 2024
   Lira2024:
-    title: Large language models for zero touch network configuration management
+    title: "Large language models for zero touch network configuration management"
     author:
     - name: Oscar G. Lira
     - name: Oscar M. Caicedo
     - name: Nelson L. S. da Fonseca
     date: 2024
   Wang2024NetConfEval:
-    title: Netconfeval: Can llms facilitate network configuration?
+    title: "Netconfeval: Can llms facilitate network configuration?"
     author:
     - name: Changjie Wang
     - name: Mariano Scazzariello
     - name: Alireza Farshin
     - name: Simone Ferlin
-    - name: Dejan Kostić
+    - name: Dejan Kostic
     - name: Marco Chiesa
     date: 2024
   
-
 
 ...
 
@@ -167,14 +166,14 @@ This document specifies an evaluation framework and related definitions for inte
 
 # Introduction
 
-Network configuration is fundamental to ensuring network stability, scalability, and conformance with intended design behavior. Effective configuration requires not only a comprehensive understanding of network technologies but also advanced capabilities for interpreting complex topologies, analyzing dependencies, and specifying parameters accurately.  Traditional automation approaches such as Ansible playbooks{{Ansible2023}}, NETCONF{{RFC6241}}/YANG models{{RFC7950}}, or program-synthesis methods—either demand extensive manual scripting or are limited to narrow problem domains.  In parallel, Large Language Models (LLMs) have demonstrated the ability to interpret natural‐language instructions and generate device‐specific commands, showing promise for intent‐driven automation in networking.  However, existing work remains fragmented and lacks a standardized way to measure whether an LLM can truly operate as an autonomous agent in realistic, multi‐step configuration scenarios.
+Network configuration is fundamental to ensuring network stability, scalability, and conformance with intended design behavior. Effective configuration requires not only a comprehensive understanding of network technologies but also advanced capabilities for interpreting complex topologies, analyzing dependencies, and specifying parameters accurately.  Traditional automation approaches such as Ansible playbooks{{A2023}}, NETCONF{{RFC6241}}/YANG models{{RFC7950}}, or program-synthesis methods—either demand extensive manual scripting or are limited to narrow problem domains{{Kreutz2014}}.  In parallel, Large Language Models (LLMs) have demonstrated the ability to interpret natural‐language instructions and generate device‐specific commands, showing promise for intent‐driven automation in networking.  However, existing work remains fragmented and lacks a standardized way to measure whether an LLM can truly operate as an autonomous agent in realistic, multi‐step configuration scenarios.
 
 Despite encouraging results in individual subtasks, most evaluations{{Wang2024NetConfEval}} rely on static datasets and ad hoc metrics that do not reflect real‐world complexity.  As a result:
 - There is no common benchmark suite covering diverse configuration domains (routing, QoS, security) with clearly defined intents, topologies, and ground truth.
 - Existing tests seldom involve interactive environments that emulate vendor‐specific device behavior or provide runtime feedback on command execution.
 - Evaluation metrics are often limited to simple syntactic checks or isolated command validation, failing to capture whether the intended network behavior is actually achieved.
 
-Consequently, it is difficult to compare different LLM approaches or to identify gaps in reasoning, context‐sensitivity, and error‐correction capabilities{{Long2025}}{{Liu2024}}{{Fuad2024}}.  To address these shortcomings, this document introduce **NetConfBench**, a holistic framework that provides:
+Consequently, it is difficult to compare different LLM approaches or to identify gaps in reasoning, context‐sensitivity, and error‐correction capabilities{{Long2025}}{{Liu2024}}{{Fuad2024}}{{Lira2024}}.  To address these shortcomings, this document introduce **NetConfBench**, a holistic framework that provides:
 1. An emulator­based environment (built on GNS3) to simulate realistic device interactions.
 2. A benchmark suite of forty tasks spanning multiple domains, each defined by intent, topology, initial state, and expert‐validated ground truth.
 3. Multi­dimensional metrics—*reasoning score*, *command score*, and *testcase score*—that evaluate an agent’s internal reasoning coherence, semantic correctness of generated commands, and functional outcomes in the emulated network.
@@ -248,7 +247,7 @@ NetConfBench consists of four key components:
    - **Testcases**: A set of verification procedures (e.g., *show*, *ping*, *ACL* checks) that confirm functional intent satisfaction.  
 
 2. **Emulator Environment**  
-   Built on GNS3 \[22\], this component launches official vendor images for routers and switches, replicating realistic CLI behavior.  Key interfaces include:
+   Built on GNS3, this component launches official vendor images for routers and switches, replicating realistic CLI behavior.  Key interfaces include:
    - **Agent-Network Interface (ANI)**: 
       Based on the key stages commonly involved in intent-driven network configuration, we design an Agent-Network Interface to facilitate structured interactions between the LLM agent and the emulated network environment. This interface supports four core actions: `get-topology`, `get-running-cfg`, `update-cfg`, and `execute-cmd`. 
      - `get-topology`: provides this information in a
@@ -264,7 +263,7 @@ subsequent updates.
 3. **LLM Agent**  
    A modular component that can be implemented with any LLM (open-source or closed-source).  It interacts with the emulator via the **Agent-Network Interface** (ANI), issuing queries such as `get-topology`, `get-running-cfg`, `update-cfg`, and `execute-cmd`.  Agents may use:
    - **Single-Turn Generation**: The entire reasoning and command generation in one pass.  
-   - **ReAct-Style Multi-Turn Interaction**: Interleaved reasoning and actions, with runtime feedback guiding subsequent steps \[21\].  
+   - **ReAct-Style Multi-Turn Interaction**: Interleaved reasoning and actions, with runtime feedback guiding subsequent steps.  
    - **External Knowledge Retrieval**: (Optional) Queries to a command manual to resolve vendor-specific syntax.
 
 4. **Evaluator**  
@@ -328,17 +327,24 @@ Each configuration task is defined as a JSON object with the following structure
 {
   "task_name": "Static Routing",
   "intents": [
-    "NewYork: create a static route pointing to the Loopback0 on Washington, traffic should pass the 192.168.1.0 network.",
-    "NewYork: create a backup static route pointing to the Loopback0 on Washington, administrative distance should be 100."
+    "NewYork: create a static route pointing to the Loopback0 on
+    Washington, traffic should pass the 192.168.1.0 network.",
+    "NewYork: create a backup static route pointing to the Loopback0
+    on Washington, administrative distance should be 100."
     ...
   ],
   "topology": {
     "nodes": ["NewYork", "Washington"],
-    "links": ["NewYork S0/0 <-> Washington S0/0 ", "NewYork S0/1 <-> Washington S0/1"]
+    "links": [
+      "NewYork S0/0 <-> Washington S0/0 ", 
+      "NewYork S0/1 <-> Washington S0/1"
+    ]
   },
   "startup_configs": {
-    "NewYork": "!\r\nversion 12.4\r\nservice timestamps debug datetime msec\r\n...", 
-    "Washington": "!\r\nversion 12.4\r\nservice timestamps debug datetime msec\r\n...",
+    "NewYork": "!\r\nversion 12.4\r\nservice timestamps
+    debug datetime msec\r\n...", 
+    "Washington": "!\r\nversion 12.4\r\nservice timestamps
+    debug datetime msec\r\n...",
   },
   "ground_truth_configs": {
     "NewYork": [
@@ -347,11 +353,17 @@ Each configuration task is defined as a JSON object with the following structure
     ],
     ...
   },
-  "ground_truth_reasoning": "NewYork to Washington Loopback (primary path): add a static route for Washington's Loopback0 network (2.2.2.0/30) pointing to the next-hop 192.168.1.2...",
+  "ground_truth_reasoning": "NewYork to Washington Loopback 
+  (primary path): add a static route for Washington's 
+  Loopback0 network (2.2.2.0/30) pointing to the 
+  next-hop 192.168.1.2...",
   "testcases": [
     {
       "name": "Static Route from NewYork to Washington",
-      "expected_result": {"protocol": "static", "next_hop": "192.168.1.2"}
+      "expected_result": {
+        "protocol": "static", 
+        "next_hop": "192.168.1.2"
+      }
     },
     ...
   ]
