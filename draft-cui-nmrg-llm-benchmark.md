@@ -20,10 +20,10 @@
 #
 ###
 title: "A Framework to Evaluate LLM Agents for Network Configuration"
-abbrev: "Eval4LLM"
+abbrev: "NetConfBench"
 category: info
 
-docname: draft-cui-nmrg-llm-benchmark
+docname: draft-cui-nmrg-llm-benchmark-00
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
 date:
@@ -93,6 +93,7 @@ author:
 normative:
   RFC6241:
   RFC7950:
+  
 informative:
   Kreutz2014:
     title: "Software-defined networking: A comprehensive survey"
@@ -159,26 +160,26 @@ informative:
 
 --- abstract
 
-This document specifies an evaluation framework and related definitions for intent-driven network configuration using Large Language Model(LLM)–based agents. The framework combines an emulator-based interactive environment, a suite of representative tasks, and multi-dimensional metrics to assess reasoning quality, command accuracy, and functional correctness.  The framework aims to enable reproducible, comprehensive, and fair comparisons among LLM-driven network configuration approaches.
+This document specifies an evaluation framework and related definitions for intent-driven network configuration using Large Language Model(LLM)-based agents. The framework combines an emulator-based interactive environment, a suite of representative tasks, and multi-dimensional metrics to assess reasoning quality, command accuracy, and functional correctness.  The framework aims to enable reproducible, comprehensive, and fair comparisons among LLM-driven network configuration approaches.
 
 
 --- middle
 
 # Introduction
 
-Network configuration is fundamental to ensuring network stability, scalability, and conformance with intended design behavior. Effective configuration requires not only a comprehensive understanding of network technologies but also advanced capabilities for interpreting complex topologies, analyzing dependencies, and specifying parameters accurately.  Traditional automation approaches such as Ansible playbooks{{A2023}}, NETCONF{{RFC6241}}/YANG models{{RFC7950}}, or program-synthesis methods—either demand extensive manual scripting or are limited to narrow problem domains{{Kreutz2014}}.  In parallel, Large Language Models (LLMs) have demonstrated the ability to interpret natural‐language instructions and generate device‐specific commands, showing promise for intent‐driven automation in networking.  However, existing work remains fragmented and lacks a standardized way to measure whether an LLM can truly operate as an autonomous agent in realistic, multi‐step configuration scenarios.
+Network configuration is fundamental to ensuring network stability, scalability, and conformance with intended design behavior. Effective configuration requires not only a comprehensive understanding of network technologies but also advanced capabilities for interpreting complex topologies, analyzing dependencies, and specifying parameters accurately.  Traditional automation approaches such as Ansible playbooks{{A2023}}, NETCONF{{RFC6241}}/YANG models{{RFC7950}}, or program-synthesis methods-either demand extensive manual scripting or are limited to narrow problem domains{{Kreutz2014}}.  In parallel, Large Language Models (LLMs) have demonstrated the ability to interpret natural-language instructions and generate device-specific commands, showing promise for intent-driven automation in networking.  However, existing work remains fragmented and lacks a standardized way to measure whether an LLM can truly operate as an autonomous agent in realistic, multi-step configuration scenarios.
 
-Despite encouraging results in individual subtasks, most evaluations{{Wang2024NetConfEval}} rely on static datasets and ad hoc metrics that do not reflect real‐world complexity.  As a result:
+Despite encouraging results in individual subtasks, most evaluations{{Wang2024NetConfEval}} rely on static datasets and ad hoc metrics that do not reflect real-world complexity.  As a result:
 - There is no common benchmark suite covering diverse configuration domains (routing, QoS, security) with clearly defined intents, topologies, and ground truth.
-- Existing tests seldom involve interactive environments that emulate vendor‐specific device behavior or provide runtime feedback on command execution.
+- Existing tests seldom involve interactive environments that emulate vendor-specific device behavior or provide runtime feedback on command execution.
 - Evaluation metrics are often limited to simple syntactic checks or isolated command validation, failing to capture whether the intended network behavior is actually achieved.
 
-Consequently, it is difficult to compare different LLM approaches or to identify gaps in reasoning, context‐sensitivity, and error‐correction capabilities{{Long2025}}{{Liu2024}}{{Fuad2024}}{{Lira2024}}.  To address these shortcomings, this document introduce **NetConfBench**, a holistic framework that provides:
-1. An emulator­based environment (built on GNS3) to simulate realistic device interactions.
-2. A benchmark suite of forty tasks spanning multiple domains, each defined by intent, topology, initial state, and expert‐validated ground truth.
-3. Multi­dimensional metrics—*reasoning score*, *command score*, and *testcase score*—that evaluate an agent’s internal reasoning coherence, semantic correctness of generated commands, and functional outcomes in the emulated network.
+Consequently, it is difficult to compare different LLM approaches or to identify gaps in reasoning, context-sensitivity, and error-correction capabilities{{Long2025}}{{Liu2024}}{{Fuad2024}}{{Lira2024}}.  To address these shortcomings, this document introduce **NetConfBench**, a holistic framework that provides:
+1. An emulatorbased environment (built on GNS3) to simulate realistic device interactions.
+2. A benchmark suite of forty tasks spanning multiple domains, each defined by intent, topology, initial state, and expert-validated ground truth.
+3. Multidimensional metrics-*reasoning score*, *command score*, and *testcase score*-that evaluate an agent's internal reasoning coherence, semantic correctness of generated commands, and functional outcomes in the emulated network.
 
-NetConfBench aims to enable reproducible, comprehensive comparisons among single­turn LLMs, ReAct­style multi­turn agents, and knowledge­augmented variants, guiding future research toward truly autonomous, intent‐driven network configuration.
+NetConfBench aims to enable reproducible, comprehensive comparisons among singleturn LLMs, ReActstyle multiturn agents, and knowledge-augmented variants, guiding future research toward truly autonomous, intent-driven network configuration.
 
 # Terminology
 
@@ -195,7 +196,7 @@ are defined:
 
 - Task: A single evaluation unit defined by (1) a scenario category, (2) an environment topology, (3) initial device configurations, and (4) an intent. The agent is evaluated on its ability to fulfill the intent in the given environment.
 
-- Testcase: A concrete, executable set of verification steps (e.g., ping tests, traffic-flow validation, policy checks) used to assert whether the agent’s final configuration satisfies the intent.
+- Testcase: A concrete, executable set of verification steps (e.g., ping tests, traffic-flow validation, policy checks) used to assert whether the agent's final configuration satisfies the intent.
 
 # Framework Overview
     
@@ -230,7 +231,7 @@ are defined:
 
     Figure 1: The NetConfBench Framework
 
-The proposed framework is shown in Figure 1. The flow begins with a **Task Dataset** defining network intents and topologies. The **LLM Agent** perceives the environment, reasons about required actions, and applies configuration commands. The **Environment** simulates or controls real devices, providing feedback for each action. Finally, the **Evaluator** compares the agent’s outputs against ground-truth configurations and reasoning, computing scores for accuracy and completion.
+The proposed framework is shown in Figure 1. The flow begins with a **Task Dataset** defining network intents and topologies. The **LLM Agent** perceives the environment, reasons about required actions, and applies configuration commands. The **Environment** simulates or controls real devices, providing feedback for each action. Finally, the **Evaluator** compares the agent's outputs against ground-truth configurations and reasoning, computing scores for accuracy and completion.
 
 
 ## Components
@@ -256,8 +257,8 @@ format interpretable by the LLM.
 subsequent updates.
      - `update-cfg`: allows the agent to apply new configuration commands and provides detailed feedback on their execution, including whether each command was accepted or resulted in any errors.
      - `execute-cmd`: accepts a device name and a command string as parameters and returns the resulting output.
-   - **Task Evaluation Interface**: To enable reliable and objective assessment of the LLM agent’s configuration behavior, the environment provides a Task Evaluation Interface that allows the evaluation module to access relevant execution results. Specifically, this interface supports:
-     - **Exporting the final configurations of all devices**: This allows for direct comparison with ground truth configurations to evaluate the correctness and completeness of the agent’s output.  
+   - **Task Evaluation Interface**: To enable reliable and objective assessment of the LLM agent's configuration behavior, the environment provides a Task Evaluation Interface that allows the evaluation module to access relevant execution results. Specifically, this interface supports:
+     - **Exporting the final configurations of all devices**: This allows for direct comparison with ground truth configurations to evaluate the correctness and completeness of the agent's output.  
      - **Executing a set of predefined testcases**: These testcases are designed to verify whether the resulting network behavior accurately reflects the intended configuration objectives, as defined by the network intent.
 
 3. **LLM Agent**  
@@ -269,10 +270,10 @@ subsequent updates.
 4. **Evaluator**  
    Computes three core metrics for each task:  
    - **Reasoning Score (`S_reasoning`)**:  
-     - Embedding-based cosine similarity between the agent’s reasoning trace and the ground truth reasoning.  
+     - Embedding-based cosine similarity between the agent's reasoning trace and the ground truth reasoning.  
      - Ranges from 0 to 1.  
    - **Command Score (`S_command`)**:  
-     - Hierarchical diff of final vs. initial router configurations (using Python’s `ciscoconfparse`).  
+     - Hierarchical diff of final vs. initial router configurations (using Python's `ciscoconfparse`).  
      - Wildcard matching ignores non-essential identifiers (e.g., ACL numbers).  
      - Compute precision = (correctly generated commands / total generated) and recall = (correctly generated / ground truth commands).  
      - `S_command` is the harmonic mean of precision and recall, ranging from 0 to 1.  
@@ -289,7 +290,7 @@ The evaluation workflow for each task proceeds through six stages:
    NetConfBench selects a task from the JSON dataset and provides only the high-level intent(s) to the LLM agent.
 
 2. **Environment Setup**  
-   The framework instantiates a GNS3 topology based on the task’s `topology` and applies the `startup-config` to each device.  Once the emulated network reaches a stable state, control transfers to the agent.
+   The framework instantiates a GNS3 topology based on the task's `topology` and applies the `startup-config` to each device.  Once the emulated network reaches a stable state, control transfers to the agent.
 
 3. **Interactive Execution**  
    The LLM agent receives the partial prompt containing:
@@ -299,8 +300,8 @@ The evaluation workflow for each task proceeds through six stages:
    The agent issues a sequence of API calls; for single-turn agents, it outputs reasoning followed by a batch of CLI commands.  For multi-turn agents, it alternates reasoning traces and API calls.
 
 4. **Reasoning Trajectory Export**  
-   After execution completes (agent signals “task done” or after a predefined command budget), NetConfBench captures the entire reasoning log:
-   - For single-turn: the reasoning paragraph embedded in the LLM’s output.  
+   After execution completes (agent signals "task done" or after a predefined command budget), NetConfBench captures the entire reasoning log:
+   - For single-turn: the reasoning paragraph embedded in the LLM's output.  
    - For ReAct: an auxiliary summarization LLM condenses the interleaved reasoning and actions into a single coherent trace.
 
 5. **Final Configuration Export**  
@@ -309,7 +310,7 @@ The evaluation workflow for each task proceeds through six stages:
 6. **Testcase Execution and Scoring**  
    - **Command Score:** Hierarchical diff against ground truth commands.  
    - **Testcase Score:** Execute each testcase in sequence; record pass/fail.  
-   - **Reasoning Score:** Compute embedding similarity between the agent’s reasoning trace and ground truth reasoning.
+   - **Reasoning Score:** Compute embedding similarity between the agent's reasoning trace and ground truth reasoning.
 
 The final per-task score is typically reported as a tuple `(S_reasoning, S_command, S_testcase)`.  Aggregate results across the forty tasks enable comparisons among LLMs and interaction strategies.
 
@@ -415,7 +416,11 @@ The Agent-Network Interface defines the minimal API primitives necessary for int
 
      ~~~ json
      {
-       "running_config": "interface Gig0/0\n ip address 192.168.1.1 255.255.255.252\n..."
+       "running_config": "
+        interface Gig0/0
+        ip address 192.168.1.1 255.255.255.255
+        ...
+       "
      }
      ~~~
     
@@ -443,7 +448,9 @@ The Agent-Network Interface defines the minimal API primitives necessary for int
      {
        "results": [
          { "command": "configure terminal", "status": "success" },
-         { "command": "ip route 2.2.2.0 255.255.255.252 192.168.1.2", "status": "success" }
+         { 
+         "command": "ip route 2.2.2.0 255.255.255.252 192.168.1.2", 
+         "status": "success" }
        ]
      }
      ~~~
@@ -523,8 +530,14 @@ After the agent signals completion, the framework uses the Task Evaluation Inter
     ~~~ json
     {
       "results": [
-        { "name": "Verify primary static route on R1", "status": "pass" },
-        { "name": "Verify backup static route on R1", "status": "fail" }
+        { 
+          "name": "Verify primary static route on R1", 
+          "status": "pass" 
+        },
+        { 
+          "name": "Verify backup static route on R1", 
+          "status": "fail" 
+        }
       ]
     }
     ~~~
