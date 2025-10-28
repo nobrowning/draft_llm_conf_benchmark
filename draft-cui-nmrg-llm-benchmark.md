@@ -23,8 +23,8 @@ title: "A Framework to Evaluate LLM Agents for Network Configuration"
 abbrev: "NetConfBench"
 category: info
 
-docname: draft-cui-nmrg-llm-benchmark-00
-submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
+docname: draft-cui-nmrg-llm-benchmark
+submissiontype: IRTF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
 date:
 consensus: true
@@ -36,12 +36,12 @@ keyword:
  - Network Configuration
  - Benchmark
 venue:
-  group: WG
-  type: Working Group
-  mail: WG@example.com
-  arch: https://example.com/WG
-  github: USER/REPO
-  latest: https://example.com/LATEST
+  group: Network Management
+  type: Research Group
+  mail: nmrg@irtf.org
+  arch: https://mailarchive.ietf.org/arch/browse/nmrg
+  github: nobrowning/draft_llm_conf_benchmark
+  latest: https://datatracker.ietf.org/doc/draft-cui-nmrg-llm-benchmark/
 
 author:
 - role:  # remove if not true
@@ -162,7 +162,6 @@ informative:
 
 This document specifies an evaluation framework and related definitions for intent-driven network configuration using Large Language Model(LLM)-based agents. The framework combines an emulator-based interactive environment, a suite of representative tasks, and multi-dimensional metrics to assess reasoning quality, command accuracy, and functional correctness.  The framework aims to enable reproducible, comprehensive, and fair comparisons among LLM-driven network configuration approaches.
 
-
 --- middle
 
 # Introduction
@@ -175,11 +174,11 @@ Despite encouraging results in individual subtasks, most evaluations{{Wang2024Ne
 - Evaluation metrics are often limited to simple syntactic checks or isolated command validation, failing to capture whether the intended network behavior is actually achieved.
 
 Consequently, it is difficult to compare different LLM approaches or to identify gaps in reasoning, context-sensitivity, and error-correction capabilities{{Long2025}}{{Liu2024}}{{Fuad2024}}{{Lira2024}}.  To address these shortcomings, this document introduce **NetConfBench**, a holistic framework that provides:
-1. An emulatorbased environment (built on GNS3) to simulate realistic device interactions.
-2. A benchmark suite of forty tasks spanning multiple domains, each defined by intent, topology, initial state, and expert-validated ground truth.
+1. An emulator-based environment (built on GNS3) to simulate realistic device interactions.
+2. A benchmark suite of forty tasks spanning routing, QoS, and security, each defined by intent, topology, initial state, ground-truth configuration, annotated reasoning trace, and expert-crafted testcases.
 3. Multidimensional metrics-*reasoning score*, *command score*, and *testcase score*-that evaluate an agent's internal reasoning coherence, semantic correctness of generated commands, and functional outcomes in the emulated network.
 
-NetConfBench aims to enable reproducible, comprehensive comparisons among singleturn LLMs, ReActstyle multiturn agents, and knowledge-augmented variants, guiding future research toward truly autonomous, intent-driven network configuration.
+NetConfBench aims to enable reproducible, comprehensive comparisons among single-turn LLMs, ReAct-style multiturn agents, and knowledge-augmented variants, guiding future research toward truly autonomous, intent-driven network configuration.
 
 # Terminology
 
@@ -198,10 +197,12 @@ are defined:
 
 - Testcase: A concrete, executable set of verification steps (e.g., ping tests, traffic-flow validation, policy checks) used to assert whether the agent's final configuration satisfies the intent.
 
+- MCP (Model Context Protocol): An open standard protocol designed to facilitate communication between LLMs and external data sources or tools, enabling standardized tool discovery, invocation, and result handling.
+
 # Framework Overview
     
     +------------------+
-    |    Task Datase   |                     +-------------------------+
+    |    Task Dataset  |                     +-------------------------+
     |+----------------+|    +-----------+    |        Evaluator        |
     ||Network Intents ||(1) |           |(4) |+----------+ +----------+|
     ||+--------+      |---->| LLM Agent |<--->|Reasoning | |Grnd Truth||
@@ -233,6 +234,7 @@ are defined:
 
 The proposed framework is shown in Figure 1. The flow begins with a **Task Dataset** defining network intents and topologies. The **LLM Agent** perceives the environment, reasons about required actions, and applies configuration commands. The **Environment** simulates or controls real devices, providing feedback for each action. Finally, the **Evaluator** compares the agent's outputs against ground-truth configurations and reasoning, computing scores for accuracy and completion.
 
+The framework supports multiple communication protocols for agent-environment interaction, including direct API calls and standardized protocols such as MCP. When using MCP, network operations are encapsulated as tools that can be discovered and invoked by the LLM agent through the MCP client-server architecture.
 
 ## Components
 
@@ -244,43 +246,76 @@ NetConfBench consists of four key components:
    - **Topology**: A list of node names and link definitions.  
    - **Initial Configuration**: The initial configuration state of all nodes.  
    - **Ground Truth Configuration**: Expert-validated CLI commands that achieve the intent.  
-   - **Ground Truth Reasoning**: A narrative describing step-by-step logic used to derive the commands.  
+   - **Ground Truth Reasoning**: A textual record of the agent's step-by-step reasoning that maps high-level intent to low-level configuration actions.
    - **Testcases**: A set of verification procedures (e.g., *show*, *ping*, *ACL* checks) that confirm functional intent satisfaction.  
 
 2. **Emulator Environment**  
    Built on GNS3, this component launches official vendor images for routers and switches, replicating realistic CLI behavior.  Key interfaces include:
    - **Agent-Network Interface (ANI)**: 
-      Based on the key stages commonly involved in intent-driven network configuration, we design an Agent-Network Interface to facilitate structured interactions between the LLM agent and the emulated network environment. This interface supports four core actions: `get-topology`, `get-running-cfg`, `update-cfg`, and `execute-cmd`. 
-     - `get-topology`: provides this information in a
-format interpretable by the LLM.
-     - `get-running-cfg`: enables the agent to obtain the active configurations of specified devices, providing essential context for planning.
-subsequent updates.
+      Based on the key stages commonly involved in intent-driven network configuration, the framework provides an Agent-Network Interface to facilitate structured interactions between the LLM agent and the emulated network environment. This interface supports four core actions: `get-topology`, `get-running-cfg`, `update-cfg`, and `execute_validation`. 
+     - `get-topology`: provides this information in a format interpretable by the LLM.
+     - `get-running-cfg`: enables the agent to obtain the active configurations of specified devices, providing essential context for planning subsequent updates.
      - `update-cfg`: allows the agent to apply new configuration commands and provides detailed feedback on their execution, including whether each command was accepted or resulted in any errors.
-     - `execute-cmd`: accepts a device name and a command string as parameters and returns the resulting output.
+     - `execute_validation`: accepts a device name and a command string as parameters and returns the resulting output.
    - **Task Evaluation Interface**: To enable reliable and objective assessment of the LLM agent's configuration behavior, the environment provides a Task Evaluation Interface that allows the evaluation module to access relevant execution results. Specifically, this interface supports:
      - **Exporting the final configurations of all devices**: This allows for direct comparison with ground truth configurations to evaluate the correctness and completeness of the agent's output.  
      - **Executing a set of predefined testcases**: These testcases are designed to verify whether the resulting network behavior accurately reflects the intended configuration objectives, as defined by the network intent.
 
 3. **LLM Agent**  
-   A modular component that can be implemented with any LLM (open-source or closed-source).  It interacts with the emulator via the **Agent-Network Interface** (ANI), issuing queries such as `get-topology`, `get-running-cfg`, `update-cfg`, and `execute-cmd`.  Agents may use:
+   A modular component that can be implemented with any LLM (open-source or closed-source).  It interacts with the emulator via the **Agent-Network Interface** (ANI), issuing queries such as `get-topology`, `get-running-cfg`, `update-cfg`, and `execute_validation`.  Agents may use:
    - **Single-Turn Generation**: The entire reasoning and command generation in one pass.  
    - **ReAct-Style Multi-Turn Interaction**: Interleaved reasoning and actions, with runtime feedback guiding subsequent steps.  
    - **External Knowledge Retrieval**: (Optional) Queries to a command manual to resolve vendor-specific syntax.
 
 4. **Evaluator**  
    Computes three core metrics for each task:  
-   - **Reasoning Score (`S_reasoning`)**:  
-     - Embedding-based cosine similarity between the agent's reasoning trace and the ground truth reasoning.  
-     - Ranges from 0 to 1.  
-   - **Command Score (`S_command`)**:  
-     - Hierarchical diff of final vs. initial router configurations (using Python's `ciscoconfparse`).  
-     - Wildcard matching ignores non-essential identifiers (e.g., ACL numbers).  
-     - Compute precision = (correctly generated commands / total generated) and recall = (correctly generated / ground truth commands).  
-     - `S_command` is the harmonic mean of precision and recall, ranging from 0 to 1.  
-   - **Testcase Score (`S_testcase`)**:  
-     - Portion of testcases passed in the emulated environment.  
-     - Fine-grained sub-intents (per device) each correspond to a testcase.  
-     - `S_testcase` is the testcase pass rate, defined as the proportion of passed testcases among all defined testcases.  
+
+   - **Reasoning Score (`S_reasoning`)**
+
+      The reasoning score evaluates whether the agent can coherently map network intents to concrete configuration actions through semantically aligned reasoning. This score compares the agent's reasoning process with a predefined ground truth reasoning process, focusing on logical consistency and semantic similarity.
+
+      For one-shot prediction, prompts are designed to elicit the reasoning process prior to command generation, enabling direct comparison. For multi-turn interaction, an auxiliary LLM summarizes the interleaved steps into a unified reasoning process, which is then compared against the ground truth.
+       The reasoning score is computed using cosine similarity:
+
+      ```
+      S_reasoning = (r_agent * r_gt) / (||r_agent|| * ||r_gt||)
+      ```
+
+      where r_agent is the embedding of the agent's reasoning process, and r_gt is the embedding of the ground truth reasoning process.
+
+   - **Command Score (`S_command`)**
+     
+     This evaluation comprehensively assesses the effectiveness of configuration commands generated by the agent. While syntactic correctness is a prerequisite, it does not ensure that configuration commands are correctly applied to the device, particularly when commands must be issued within specific configuration contexts.
+     
+     After the agent completes its configuration task, the final configurations of all devices are exported and compared to their initial configurations to extract the set of commands that were actually applied. Hierarchical parsing using the Python library `ciscoconfparse` ensures structural completeness during comparison. Since certain configuration parameters (e.g., ACL numbers, route policy names) are manually defined and do not have fixed values, wildcard-based fuzzy matching is introduced to ignore non-essential differences and focus on semantic equivalence.
+     
+     Based on the extracted command sets, standard precision and recall are computed:
+     - Precision measures the proportion of correctly generated commands among all generated commands
+     - Recall measures the proportion of correctly generated commands relative to the ground truth command set
+     
+     The command score is reported as the harmonic mean of precision and recall:
+     
+     ```
+     S_command = (2 * Precision * Recall) / (Precision + Recall)
+     ```
+   - **Testcase Score (`S_testcase`)**
+
+     While command-level evaluation based on configuration differences can effectively measure the semantic correctness of generated commands, it does not fully reflect whether the configuration actually achieves the intended network behaviors. To address this limitation, a testcase-driven evaluation strategy is introduced that directly verifies the functional correctness of the agent's configuration in the target environment.
+
+     A set of validation testcases is defined for each task, where each testcase encodes a network intent in the form of executable verification commands. To support complex tasks involving multiple sub-goals, the overall intent is decomposed into sub-intents based on node-specific configuration objectives. Each sub-intent is then formulated as an individual testcase to enable fine-grained evaluation and enhance interpretability.
+
+     Examples of testcases include:
+     - **Routing intent**: Verifying the next hop selection on intermediate routers to confirm end-to-end path correctness
+     - **ACL intent**: Simulating traffic flows and validating whether they are allowed or denied as expected
+     - **QoS intent**: Inspecting interface statistics to check whether QoS policies are properly enforced
+
+     The testcase score is defined as the proportion of passed testcases among all defined testcases:
+
+     ```
+     S_testcase = |Passed Testcases| / |Total Testcases|
+     ```
+
+     This score reflects the agent's ability to produce configurations that meet functional requirements and demonstrates practical applicability in real-world deployment scenarios.
 
 ## Workflow
 
@@ -294,10 +329,11 @@ The evaluation workflow for each task proceeds through six stages:
 
 3. **Interactive Execution**  
    The LLM agent receives the partial prompt containing:
-   - The API specification for `get-topology`, `get-running-cfg`, `update-cfg`, and `execute-cmd`.  
+   - The API specification for `get-topology`, `get-running-cfg`, `update-cfg`, and `execute_validation`.  
    - The natural language intent.  
    - (Optionally) Device model/version hints.  
-   The agent issues a sequence of API calls; for single-turn agents, it outputs reasoning followed by a batch of CLI commands.  For multi-turn agents, it alternates reasoning traces and API calls.
+   - The agent issues a sequence of API calls; for single-turn agents, it outputs reasoning followed by a batch of CLI commands.  For multi-turn agents, it alternates reasoning traces and API calls.
+   When using MCP, network operations are encapsulated as tools that can be discovered and invoked by the LLM agent through the MCP client-server architecture.
 
 4. **Reasoning Trajectory Export**  
    After execution completes (agent signals "task done" or after a predefined command budget), NetConfBench captures the entire reasoning log:
@@ -313,8 +349,6 @@ The evaluation workflow for each task proceeds through six stages:
    - **Reasoning Score:** Compute embedding similarity between the agent's reasoning trace and ground truth reasoning.
 
 The final per-task score is typically reported as a tuple `(S_reasoning, S_command, S_testcase)`.  Aggregate results across the forty tasks enable comparisons among LLMs and interaction strategies.
-
-
 
 # Data Model
 
@@ -457,12 +491,12 @@ The Agent-Network Interface defines the minimal API primitives necessary for int
       
    - **Description**: Applies a sequence of CLI commands to the specified device.  Returns per-command status and any error messages.
 
-4. **`execute-cmd`**  
+4. **`execute_validation`**  
    - **Request**:
 
      ~~~ json
      {
-       "method": "execute-cmd",
+       "method": "execute_validation",
        "params": {
          "device": "R1",
          "command": "show ip route 2.2.2.0 255.255.255.252"
@@ -544,15 +578,296 @@ After the agent signals completion, the framework uses the Task Evaluation Inter
     
   - **Description**: Executes each verification command sequence on the appropriate device and compares actual output against `expected_output` (regular expression).  Returns pass/fail for each testcase.
 
+# MCP-Based Implementation
+
+The Model Context Protocol (MCP) provides a standardized approach for implementing the Agent-Network Interface (ANI). This section describes how MCP can be applied to NetConfBench for LLM-driven network configuration evaluation.
+
+## Benefits of MCP Integration
+
+Integrating MCP into NetConfBench provides several advantages:
+
+1. **Standardization**: MCP provides a uniform interface for tool invocation across different LLM implementations and network environments.
+
+2. **Vendor Abstraction**: The MCP server can handle vendor-specific command translation, allowing the LLM to work with high-level operations without needing detailed knowledge of each vendor's CLI syntax.
+
+3. **Tool Extensibility**: New network operations can be easily added as MCP tools without modifying the LLM agent implementation.
+
+4. **Traceability**: The structured MCP communication protocol enables detailed logging of all tool invocations and results, facilitating debugging and analysis.
+
+5. **Ecosystem Integration**: MCP-enabled network tools can potentially be reused across different AI applications beyond network configuration evaluation.
+
+## MCP Tool Definitions for ANI Operations
+
+This subsection provides the complete MCP tool definitions for the four core Agent-Network Interface operations: `get-topology`, `get-running-cfg`, `update-cfg`, and `execute_validation`. These definitions use JSON Schema to specify tool parameters and enable LLMs to understand and invoke network operations through the MCP protocol.
+
+### 1. get_topology
+
+This tool provides network topology information in a format interpretable by the LLM, returning topology for specified devices or the entire network if no devices are specified.
+
+~~~ json
+
+{
+
+  "name": "get_topology",
+  "description": "Retrieve network topology information including
+   nodes and their interconnections. Returns topology for 
+   specified devices or entire network if no devices specified.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "devices": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "List of device names. Leave empty for 
+        entire network topology."
+      }
+    }
+  }
+}
+~~~
+
+**Usage Example**:
+
+~~~ json
+
+{
+  "method": "tools/call",
+  "params": {
+    "name": "get_topology",
+    "arguments": {
+      "devices": ["R1", "R2", "R3"]
+    }
+  }
+}
+~~~
+
+### 2. get_running_config
+
+This tool enables the agent to obtain the active configurations of specified devices, providing essential context for planning subsequent updates.
+
+~~~ json
+
+{
+  "name": "get_running_config",
+  "description": "Retrieve the active running configuration 
+  from a network device. Returns the complete configuration 
+  as a text string.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "device": {
+        "type": "string",
+        "description": "Device name or identifier to retrieve
+         configuration from"
+      }
+    },
+    "required": ["device"]
+  }
+}
+~~~
+
+**Usage Example**:
+
+~~~ json
+
+{
+  "method": "tools/call",
+  "params": {
+    "name": "get_running_config",
+    "arguments": {
+      "device": "R1"
+    }
+  }
+}
+~~~
+
+### 3. update_config
+
+This tool allows the agent to apply new configuration commands and provides detailed feedback on their execution, including whether each command was accepted or resulted in any errors.
+
+~~~ json
+
+{
+  "name": "update_config",
+  "description": "Apply configuration commands to a network
+   device. Executes a sequence of CLI commands and returns
+    detailed status for each command.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "device": {
+        "type": "string",
+        "description": "Device name or identifier to apply
+         configuration to"
+      },
+      "commands": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Ordered list of CLI commands to
+         execute on the device"
+      }
+    },
+    "required": ["device", "commands"]
+  }
+
+}
+
+~~~
+
+**Usage Example**:
+
+~~~ json
+
+{
+  "method": "tools/call",
+  "params": {
+    "name": "update_config",
+    "arguments": {
+      "device": "R1",
+      "commands": [
+        "configure terminal",
+        "interface GigabitEthernet0/0",
+        "ip address 192.168.1.1 255.255.255.0",
+        "no shutdown"
+      ]
+    }
+  }
+}
+~~~
+### 4. execute_cmd
+
+This tool accepts a device name and a read-only command string as parameters and returns the resulting output. It must not alter the device state and is intended for validation and status inspection.
+
+~~~ json
+
+{
+  "name": "execute_validation",
+  "description": "Execute a read-only validation command
+   on a network device to verify configuration or check
+    device status. This command must not alter the 
+    device state.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "device": {
+        "type": "string",
+        "description": "Device name or identifier to 
+        execute command on"
+      },
+      "command": {
+        "type": "string",
+        "description": "Read-only command to execute
+         (e.g., show commands)"
+      }
+    },
+    "required": ["device", "command"]
+  }
+}
+
+~~~
+
+**Usage Example**:
+
+~~~ json
+
+{
+  "method": "tools/call",
+  "params": {
+    "name": "execute_validation",
+    "arguments": {
+      "device": "R1",
+      "command": "show ip route 2.2.2.0 255.255.255.252"
+    }
+  }
+}
+
+~~~
+
+These four tools form the core MCP interface for NetConfBench. The MCP server must register these tools and handle the translation between MCP tool invocations and actual device communication protocols (CLI, NETCONF, RESTCONF, etc.). The JSON Schema definitions in `inputSchema` enable LLMs to automatically understand parameter requirements and generate valid tool calls.
+
+## Additional MCP Tools for Advanced Scenarios
+
+Beyond the four core ANI operations, additional MCP tools can be defined for more complex scenarios. The following examples demonstrate extended tool definitions:
+
+### batch_configure_devices
+
+For batch operations across multiple devices:
+
+~~~ json
+
+{
+  "name": "batch_configure_devices",
+  "description": "Apply configuration commands to
+   multiple network devices simultaneously",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "device_ips": {
+        "type": "array",
+        "items": {"type": "string"},
+        "description": "List of device IP addresses"
+      },
+      "commands": {
+        "type": "array",
+        "items": {"type": "string"},
+        "description": "CLI command sequence to execute"
+      },
+      "credential_id": {
+        "type": "string",
+        "description": "Authentication credential
+         identifier"
+      }
+    },
+    "required": ["device_ips", "commands"]
+  }
+}
+
+~~~
+
+### check_device_status
+
+For comprehensive device health monitoring:
+
+~~~ json
+
+{
+  "name": "check_device_status",
+  "description": "Check operational status of network
+   devices including CPU, memory, and interface metrics",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "device_ip": {
+        "type": "string",
+        "description": "Device IP address to check"
+      },
+      "metrics": {
+        "type": "array",
+        "items": {
+          "enum": ["cpu", "memory", "interface"]
+        },
+        "description": "List of metrics to retrieve"
+      }
+    },
+    "required": ["device_ip", "metrics"]
+  }
+}
+
+~~~
+
+These additional tools demonstrate the extensibility of the MCP approach, allowing the framework to support advanced scenarios such as batch operations and comprehensive device monitoring.
+
 # Security Considerations
 
-LLM-driven network configuration introduces risks such as unintended or malicious commands, emulator vulnerabilities, and data exposure; to mitigate these, NetConfBench should enforce strict input validation (e.g., YANG/XML schema checks), run emulated devices in isolated sandboxes with limited privileges, encrypt and restrict access to task definitions and logs, employ human-in-the-loop approval for generated configurations, and use curated prompt templates and fine-tuning to reduce LLM hallucinations.
-
+LLM-driven network configuration introduces risks such as unintended or malicious commands, emulator vulnerabilities, and data exposure; to mitigate these, NetConfBench should enforce strict input validation (e.g., YANG/XML schema checks), run emulated devices in isolated sandboxes with limited privileges, encrypt and restrict access to task definitions and logs, employ human-in-the-loop approval for generated configurations, and use curated prompt templates and fine-tuning to reduce LLM hallucinations. Validation endpoints must enforce read-only execution (e.g., execute-validation) to prevent unintended state changes. Where appropriate, human-in-the-loop approval should gate privileged write operations (update-cfg/update-config) identified as high-impact.
 
 # IANA Considerations
 
 This document has no IANA actions.
-
 
 --- back
 
