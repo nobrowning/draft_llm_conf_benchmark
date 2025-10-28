@@ -16,7 +16,7 @@
 <meta content="Large Language Model" name="keyword">
 <meta content="Network Configuration" name="keyword">
 <meta content="Benchmark" name="keyword">
-<meta content="draft-cui-nmrg-llm-benchmark-00" name="ietf.draft">
+<meta content="draft-cui-nmrg-llm-benchmark" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.31.0
     Python 3.12.12
@@ -1062,7 +1062,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">Network Management Research Group</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-cui-nmrg-llm-benchmark-00</dd>
+<dd class="internet-draft">draft-cui-nmrg-llm-benchmark</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
 <time datetime="2025-10-28" class="published">28 October 2025</time>
@@ -1103,14 +1103,15 @@ svg :is([fill="white"], [fill^="#fff"]) {
       </h2>
 <p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
 <p id="section-note.1-2">
-        The latest revision of this draft can be found at <span><a href="https://example.com/LATEST">https://example.com/LATEST</a></span>.
-        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-cui-nmrg-llm-benchmark/">https://datatracker.ietf.org/doc/draft-cui-nmrg-llm-benchmark/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+        The latest revision of this draft can be found at <span><a href="https://datatracker.ietf.org/doc/draft-cui-nmrg-llm-benchmark/">https://datatracker.ietf.org/doc/draft-cui-nmrg-llm-benchmark/</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-cui-nmrg-llm/">https://datatracker.ietf.org/doc/draft-cui-nmrg-llm/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
         Discussion of this document takes place on the
-        WG Working Group mailing list (<span><a href="mailto:WG@example.com">mailto:WG@example.com</a></span>),
-        which is archived at <span><a href="https://example.com/WG">https://example.com/WG</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+        Network Management Research Group mailing list (<span><a href="mailto:nmrg@irtf.org">mailto:nmrg@irtf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/nmrg">https://mailarchive.ietf.org/arch/browse/nmrg</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/nmrg/">https://www.ietf.org/mailman/listinfo/nmrg/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
 <p id="section-note.1-4">Source for this draft and an issue tracker can be found at
-        <span><a href="https://github.com/USER/REPO">https://github.com/USER/REPO</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+        <span><a href="https://github.com/nobrowning/draft_llm_conf_benchmark">https://github.com/nobrowning/draft_llm_conf_benchmark</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1148,10 +1149,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
             (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
             publication of this document. Please review these documents
             carefully, as they describe your rights and restrictions with
-            respect to this document. Code Components extracted from this
-            document must include Revised BSD License text as described in
-            Section 4.e of the Trust Legal Provisions and are provided without
-            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+            respect to this document.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="toc">
@@ -1192,27 +1190,60 @@ svg :is([fill="white"], [fill^="#fff"]) {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-references" class="internal xref">References</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-mcp-based-implementation" class="internal xref">MCP-Based Implementation</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-benefits-of-mcp-integration" class="internal xref">Benefits of MCP Integration</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-mcp-tool-definitions-for-an" class="internal xref">MCP Tool Definitions for ANI Operations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.1">
+                    <p id="section-toc.1-1.5.2.2.2.1.1"><a href="#section-5.2.1" class="auto internal xref">5.2.1</a>.  <a href="#name-1-get_topology" class="internal xref">1. get_topology</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.2">
+                    <p id="section-toc.1-1.5.2.2.2.2.1"><a href="#section-5.2.2" class="auto internal xref">5.2.2</a>.  <a href="#name-2-get_running_config" class="internal xref">2. get_running_config</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.3">
+                    <p id="section-toc.1-1.5.2.2.2.3.1"><a href="#section-5.2.3" class="auto internal xref">5.2.3</a>.  <a href="#name-3-update_config" class="internal xref">3. update_config</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-additional-mcp-tools-for-ad" class="internal xref">Additional MCP Tools for Advanced Scenarios</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3.2.1">
+                    <p id="section-toc.1-1.5.2.3.2.1.1"><a href="#section-5.3.1" class="auto internal xref">5.3.1</a>.  <a href="#name-batch_configure_devices" class="internal xref">batch_configure_devices</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3.2.2">
+                    <p id="section-toc.1-1.5.2.3.2.2.1"><a href="#section-5.3.2" class="auto internal xref">5.3.2</a>.  <a href="#name-check_device_status" class="internal xref">check_device_status</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1229,10 +1260,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
 - Existing tests seldom involve interactive environments that emulate vendor-specific device behavior or provide runtime feedback on command execution.
 - Evaluation metrics are often limited to simple syntactic checks or isolated command validation, failing to capture whether the intended network behavior is actually achieved.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">Consequently, it is difficult to compare different LLM approaches or to identify gaps in reasoning, context-sensitivity, and error-correction capabilities<span>[<a href="#Long2025" class="cite xref">Long2025</a>]</span><span>[<a href="#Liu2024" class="cite xref">Liu2024</a>]</span><span>[<a href="#Fuad2024" class="cite xref">Fuad2024</a>]</span><span>[<a href="#Lira2024" class="cite xref">Lira2024</a>]</span>.  To address these shortcomings, this document introduce <strong>NetConfBench</strong>, a holistic framework that provides:
-1. An emulatorbased environment (built on GNS3) to simulate realistic device interactions.
-2. A benchmark suite of forty tasks spanning multiple domains, each defined by intent, topology, initial state, and expert-validated ground truth.
+1. An emulator-based environment (built on GNS3) to simulate realistic device interactions.
+2. A benchmark suite of forty tasks spanning routing, QoS, and security, each defined by intent, topology, initial state, ground-truth configuration, annotated reasoning trace, and expert-crafted testcases.
 3. Multidimensional metrics-<em>reasoning score</em>, <em>command score</em>, and <em>testcase score</em>-that evaluate an agent's internal reasoning coherence, semantic correctness of generated commands, and functional outcomes in the emulated network.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">NetConfBench aims to enable reproducible, comprehensive comparisons among singleturn LLMs, ReActstyle multiturn agents, and knowledge-augmented variants, guiding future research toward truly autonomous, intent-driven network configuration.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-4">NetConfBench aims to enable reproducible, comprehensive comparisons among single-turn LLMs, ReAct-style multiturn agents, and knowledge-augmented variants, guiding future research toward truly autonomous, intent-driven network configuration.<a href="#section-1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="terminology">
@@ -1261,6 +1292,9 @@ are defined:<a href="#section-2-1" class="pilcrow">¶</a></p>
         <li class="normal" id="section-2-2.6">
           <p id="section-2-2.6.1">Testcase: A concrete, executable set of verification steps (e.g., ping tests, traffic-flow validation, policy checks) used to assert whether the agent's final configuration satisfies the intent.<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
 </li>
+        <li class="normal" id="section-2-2.7">
+          <p id="section-2-2.7.1">MCP (Model Context Protocol): An open standard protocol designed to facilitate communication between LLMs and external data sources or tools, enabling standardized tool discovery, invocation, and result handling.<a href="#section-2-2.7.1" class="pilcrow">¶</a></p>
+</li>
       </ul>
 </section>
 </div>
@@ -1272,7 +1306,7 @@ are defined:<a href="#section-2-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3-1">
 <pre>
 +------------------+
-|    Task Datase   |                     +-------------------------+
+|    Task Dataset  |                     +-------------------------+
 |+----------------+|    +-----------+    |        Evaluator        |
 ||Network Intents ||(1) |           |(4) |+----------+ +----------+|
 ||+--------+      |----&gt;| LLM Agent |&lt;---&gt;|Reasoning | |Grnd Truth||
@@ -1304,6 +1338,7 @@ Figure 1: The NetConfBench Framework
 </pre><a href="#section-3-1" class="pilcrow">¶</a>
 </div>
 <p id="section-3-2">The proposed framework is shown in Figure 1. The flow begins with a <strong>Task Dataset</strong> defining network intents and topologies. The <strong>LLM Agent</strong> perceives the environment, reasons about required actions, and applies configuration commands. The <strong>Environment</strong> simulates or controls real devices, providing feedback for each action. Finally, the <strong>Evaluator</strong> compares the agent's outputs against ground-truth configurations and reasoning, computing scores for accuracy and completion.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">The framework supports multiple communication protocols for agent-environment interaction, including direct API calls and standardized protocols such as MCP. When using MCP, network operations are encapsulated as tools that can be discovered and invoked by the LLM agent through the MCP client-server architecture.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <div id="components">
 <section id="section-3.1">
         <h3 id="name-components">
@@ -1328,7 +1363,7 @@ A repository of forty configuration tasks, each defined as a JSON object with:<a
                 <p id="section-3.1-2.1.2.4.1"><strong>Ground Truth Configuration</strong>: Expert-validated CLI commands that achieve the intent.<a href="#section-3.1-2.1.2.4.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-3.1-2.1.2.5">
-                <p id="section-3.1-2.1.2.5.1"><strong>Ground Truth Reasoning</strong>: A narrative describing step-by-step logic used to derive the commands.<a href="#section-3.1-2.1.2.5.1" class="pilcrow">¶</a></p>
+                <p id="section-3.1-2.1.2.5.1"><strong>Ground Truth Reasoning</strong>: A textual record of the agent's step-by-step reasoning that maps high-level intent to low-level configuration actions.<a href="#section-3.1-2.1.2.5.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-3.1-2.1.2.6">
                 <p id="section-3.1-2.1.2.6.1"><strong>Testcases</strong>: A set of verification procedures (e.g., <em>show</em>, <em>ping</em>, <em>ACL</em> checks) that confirm functional intent satisfaction.<a href="#section-3.1-2.1.2.6.1" class="pilcrow">¶</a></p>
@@ -1341,21 +1376,19 @@ Built on GNS3, this component launches official vendor images for routers and sw
 <ul class="normal">
 <li class="normal" id="section-3.1-2.2.2.1">
                 <p id="section-3.1-2.2.2.1.1"><strong>Agent-Network Interface (ANI)</strong>: 
- Based on the key stages commonly involved in intent-driven network configuration, we design an Agent-Network Interface to facilitate structured interactions between the LLM agent and the emulated network environment. This interface supports four core actions: <code>get-topology</code>, <code>get-running-cfg</code>, <code>update-cfg</code>, and <code>execute-cmd</code>.<a href="#section-3.1-2.2.2.1.1" class="pilcrow">¶</a></p>
+ Based on the key stages commonly involved in intent-driven network configuration, the framework provides an Agent-Network Interface to facilitate structured interactions between the LLM agent and the emulated network environment. This interface supports four core actions: <code>get-topology</code>, <code>get-running-cfg</code>, <code>update-cfg</code>, and <code>execute_validation</code>.<a href="#section-3.1-2.2.2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-2.2.2.1.2.1">
-                    <p id="section-3.1-2.2.2.1.2.1.1"><code>get-topology</code>: provides this information in a
-format interpretable by the LLM.<a href="#section-3.1-2.2.2.1.2.1.1" class="pilcrow">¶</a></p>
+                    <p id="section-3.1-2.2.2.1.2.1.1"><code>get-topology</code>: provides this information in a format interpretable by the LLM.<a href="#section-3.1-2.2.2.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
                   <li class="normal" id="section-3.1-2.2.2.1.2.2">
-                    <p id="section-3.1-2.2.2.1.2.2.1"><code>get-running-cfg</code>: enables the agent to obtain the active configurations of specified devices, providing essential context for planning.
-subsequent updates.<a href="#section-3.1-2.2.2.1.2.2.1" class="pilcrow">¶</a></p>
+                    <p id="section-3.1-2.2.2.1.2.2.1"><code>get-running-cfg</code>: enables the agent to obtain the active configurations of specified devices, providing essential context for planning subsequent updates.<a href="#section-3.1-2.2.2.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
                   <li class="normal" id="section-3.1-2.2.2.1.2.3">
                     <p id="section-3.1-2.2.2.1.2.3.1"><code>update-cfg</code>: allows the agent to apply new configuration commands and provides detailed feedback on their execution, including whether each command was accepted or resulted in any errors.<a href="#section-3.1-2.2.2.1.2.3.1" class="pilcrow">¶</a></p>
 </li>
                   <li class="normal" id="section-3.1-2.2.2.1.2.4">
-                    <p id="section-3.1-2.2.2.1.2.4.1"><code>execute-cmd</code>: accepts a device name and a command string as parameters and returns the resulting output.<a href="#section-3.1-2.2.2.1.2.4.1" class="pilcrow">¶</a></p>
+                    <p id="section-3.1-2.2.2.1.2.4.1"><code>execute_validation</code>: accepts a device name and a command string as parameters and returns the resulting output.<a href="#section-3.1-2.2.2.1.2.4.1" class="pilcrow">¶</a></p>
 </li>
                 </ul>
 </li>
@@ -1374,7 +1407,7 @@ subsequent updates.<a href="#section-3.1-2.2.2.1.2.2.1" class="pilcrow">¶</a></
 </li>
           <li id="section-3.1-2.3">
             <p id="section-3.1-2.3.1"><strong>LLM Agent</strong><br>
-A modular component that can be implemented with any LLM (open-source or closed-source).  It interacts with the emulator via the <strong>Agent-Network Interface</strong> (ANI), issuing queries such as <code>get-topology</code>, <code>get-running-cfg</code>, <code>update-cfg</code>, and <code>execute-cmd</code>.  Agents may use:<a href="#section-3.1-2.3.1" class="pilcrow">¶</a></p>
+A modular component that can be implemented with any LLM (open-source or closed-source).  It interacts with the emulator via the <strong>Agent-Network Interface</strong> (ANI), issuing queries such as <code>get-topology</code>, <code>get-running-cfg</code>, <code>update-cfg</code>, and <code>execute_validation</code>.  Agents may use:<a href="#section-3.1-2.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-2.3.2.1">
                 <p id="section-3.1-2.3.2.1.1"><strong>Single-Turn Generation</strong>: The entire reasoning and command generation in one pass.<a href="#section-3.1-2.3.2.1.1" class="pilcrow">¶</a></p>
@@ -1392,46 +1425,52 @@ A modular component that can be implemented with any LLM (open-source or closed-
 Computes three core metrics for each task:<a href="#section-3.1-2.4.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-2.4.2.1">
-                <p id="section-3.1-2.4.2.1.1"><strong>Reasoning Score (<code>S_reasoning</code>)</strong>:<a href="#section-3.1-2.4.2.1.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.1-2.4.2.1.2.1">
-                    <p id="section-3.1-2.4.2.1.2.1.1">Embedding-based cosine similarity between the agent's reasoning trace and the ground truth reasoning.<a href="#section-3.1-2.4.2.1.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="normal" id="section-3.1-2.4.2.1.2.2">
-                    <p id="section-3.1-2.4.2.1.2.2.1">Ranges from 0 to 1.<a href="#section-3.1-2.4.2.1.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                </ul>
+                <p id="section-3.1-2.4.2.1.1"><strong>Reasoning Score (<code>S_reasoning</code>)</strong><a href="#section-3.1-2.4.2.1.1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.1.2">
+The reasoning score evaluates whether the agent can coherently map network intents to concrete configuration actions through semantically aligned reasoning. This score compares the agent's reasoning process with a predefined ground truth reasoning process, focusing on logical consistency and semantic similarity.<a href="#section-3.1-2.4.2.1.2" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.1.3">
+For one-shot prediction, prompts are designed to elicit the reasoning process prior to command generation, enabling direct comparison. For multi-turn interaction, an auxiliary LLM summarizes the interleaved steps into a unified reasoning process, which is then compared against the ground truth.
+  The reasoning score is computed using cosine similarity:<a href="#section-3.1-2.4.2.1.3" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.1.4"><code>
+ S_reasoning = (r_agent * r_gt) / (||r_agent|| * ||r_gt||)
+</code><a href="#section-3.1-2.4.2.1.4" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.1.5">
+where r_agent is the embedding of the agent's reasoning process, and r_gt is the embedding of the ground truth reasoning process.<a href="#section-3.1-2.4.2.1.5" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-3.1-2.4.2.2">
-                <p id="section-3.1-2.4.2.2.1"><strong>Command Score (<code>S_command</code>)</strong>:<a href="#section-3.1-2.4.2.2.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.1-2.4.2.2.2.1">
-                    <p id="section-3.1-2.4.2.2.2.1.1">Hierarchical diff of final vs. initial router configurations (using Python's <code>ciscoconfparse</code>).<a href="#section-3.1-2.4.2.2.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="normal" id="section-3.1-2.4.2.2.2.2">
-                    <p id="section-3.1-2.4.2.2.2.2.1">Wildcard matching ignores non-essential identifiers (e.g., ACL numbers).<a href="#section-3.1-2.4.2.2.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="normal" id="section-3.1-2.4.2.2.2.3">
-                    <p id="section-3.1-2.4.2.2.2.3.1">Compute precision = (correctly generated commands / total generated) and recall = (correctly generated / ground truth commands).<a href="#section-3.1-2.4.2.2.2.3.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="normal" id="section-3.1-2.4.2.2.2.4">
-                    <p id="section-3.1-2.4.2.2.2.4.1"><code>S_command</code> is the harmonic mean of precision and recall, ranging from 0 to 1.<a href="#section-3.1-2.4.2.2.2.4.1" class="pilcrow">¶</a></p>
-</li>
-                </ul>
+                <p id="section-3.1-2.4.2.2.1"><strong>Command Score (<code>S_command</code>)</strong><a href="#section-3.1-2.4.2.2.1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.2.2">
+This evaluation comprehensively assesses the effectiveness of configuration commands generated by the agent. While syntactic correctness is a prerequisite, it does not ensure that configuration commands are correctly applied to the device, particularly when commands must be issued within specific configuration contexts.<a href="#section-3.1-2.4.2.2.2" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.2.3">
+After the agent completes its configuration task, the final configurations of all devices are exported and compared to their initial configurations to extract the set of commands that were actually applied. Hierarchical parsing using the Python library <code>ciscoconfparse</code> ensures structural completeness during comparison. Since certain configuration parameters (e.g., ACL numbers, route policy names) are manually defined and do not have fixed values, wildcard-based fuzzy matching is introduced to ignore non-essential differences and focus on semantic equivalence.<a href="#section-3.1-2.4.2.2.3" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.2.4">
+Based on the extracted command sets, standard precision and recall are computed:
+- Precision measures the proportion of correctly generated commands among all generated commands
+- Recall measures the proportion of correctly generated commands relative to the ground truth command set<a href="#section-3.1-2.4.2.2.4" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.2.5">
+The command score is reported as the harmonic mean of precision and recall:<a href="#section-3.1-2.4.2.2.5" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.2.6"><code>
+S_command = (2 * Precision * Recall) / (Precision + Recall)
+</code><a href="#section-3.1-2.4.2.2.6" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-3.1-2.4.2.3">
-                <p id="section-3.1-2.4.2.3.1"><strong>Testcase Score (<code>S_testcase</code>)</strong>:<a href="#section-3.1-2.4.2.3.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.1-2.4.2.3.2.1">
-                    <p id="section-3.1-2.4.2.3.2.1.1">Portion of testcases passed in the emulated environment.<a href="#section-3.1-2.4.2.3.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="normal" id="section-3.1-2.4.2.3.2.2">
-                    <p id="section-3.1-2.4.2.3.2.2.1">Fine-grained sub-intents (per device) each correspond to a testcase.<a href="#section-3.1-2.4.2.3.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="normal" id="section-3.1-2.4.2.3.2.3">
-                    <p id="section-3.1-2.4.2.3.2.3.1"><code>S_testcase</code> is the testcase pass rate, defined as the proportion of passed testcases among all defined testcases.<a href="#section-3.1-2.4.2.3.2.3.1" class="pilcrow">¶</a></p>
-</li>
-                </ul>
+                <p id="section-3.1-2.4.2.3.1"><strong>Testcase Score (<code>S_testcase</code>)</strong><a href="#section-3.1-2.4.2.3.1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.3.2">
+While command-level evaluation based on configuration differences can effectively measure the semantic correctness of generated commands, it does not fully reflect whether the configuration actually achieves the intended network behaviors. To address this limitation, a testcase-driven evaluation strategy is introduced that directly verifies the functional correctness of the agent's configuration in the target environment.<a href="#section-3.1-2.4.2.3.2" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.3.3">
+A set of validation testcases is defined for each task, where each testcase encodes a network intent in the form of executable verification commands. To support complex tasks involving multiple sub-goals, the overall intent is decomposed into sub-intents based on node-specific configuration objectives. Each sub-intent is then formulated as an individual testcase to enable fine-grained evaluation and enhance interpretability.<a href="#section-3.1-2.4.2.3.3" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.3.4">
+Examples of testcases include:
+- <strong>Routing intent</strong>: Verifying the next hop selection on intermediate routers to confirm end-to-end path correctness
+- <strong>ACL intent</strong>: Simulating traffic flows and validating whether they are allowed or denied as expected
+- <strong>QoS intent</strong>: Inspecting interface statistics to check whether QoS policies are properly enforced<a href="#section-3.1-2.4.2.3.4" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.3.5">
+The testcase score is defined as the proportion of passed testcases among all defined testcases:<a href="#section-3.1-2.4.2.3.5" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.3.6"><code>
+S_testcase = |Passed Testcases| / |Total Testcases|
+</code><a href="#section-3.1-2.4.2.3.6" class="pilcrow">¶</a></p>
+<p id="section-3.1-2.4.2.3.7">
+This score reflects the agent's ability to produce configurations that meet functional requirements and demonstrates practical applicability in real-world deployment scenarios.<a href="#section-3.1-2.4.2.3.7" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </li>
@@ -1458,14 +1497,17 @@ The framework instantiates a GNS3 topology based on the task's <code>topology</c
 The LLM agent receives the partial prompt containing:<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2-2.3.2.1">
-                <p id="section-3.2-2.3.2.1.1">The API specification for <code>get-topology</code>, <code>get-running-cfg</code>, <code>update-cfg</code>, and <code>execute-cmd</code>.<a href="#section-3.2-2.3.2.1.1" class="pilcrow">¶</a></p>
+                <p id="section-3.2-2.3.2.1.1">The API specification for <code>get-topology</code>, <code>get-running-cfg</code>, <code>update-cfg</code>, and <code>execute_validation</code>.<a href="#section-3.2-2.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-3.2-2.3.2.2">
                 <p id="section-3.2-2.3.2.2.1">The natural language intent.<a href="#section-3.2-2.3.2.2.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-3.2-2.3.2.3">
-                <p id="section-3.2-2.3.2.3.1">(Optionally) Device model/version hints.<br>
-The agent issues a sequence of API calls; for single-turn agents, it outputs reasoning followed by a batch of CLI commands.  For multi-turn agents, it alternates reasoning traces and API calls.<a href="#section-3.2-2.3.2.3.1" class="pilcrow">¶</a></p>
+                <p id="section-3.2-2.3.2.3.1">(Optionally) Device model/version hints.<a href="#section-3.2-2.3.2.3.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.2-2.3.2.4">
+                <p id="section-3.2-2.3.2.4.1">The agent issues a sequence of API calls; for single-turn agents, it outputs reasoning followed by a batch of CLI commands.  For multi-turn agents, it alternates reasoning traces and API calls.
+When using MCP, network operations are encapsulated as tools that can be discovered and invoked by the LLM agent through the MCP client-server architecture.<a href="#section-3.2-2.3.2.4.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </li>
@@ -1684,14 +1726,14 @@ The framework uses the Task Evaluation Interface to extract the final running co
             </ul>
 </li>
           <li id="section-4.2-2.4">
-            <p id="section-4.2-2.4.1"><strong><code>execute-cmd</code></strong><a href="#section-4.2-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-4.2-2.4.1"><strong><code>execute_validation</code></strong><a href="#section-4.2-2.4.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-4.2-2.4.2.1">
                 <p id="section-4.2-2.4.2.1.1"><strong>Request</strong>:<a href="#section-4.2-2.4.2.1.1" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-4.2-2.4.2.1.2">
 <pre>
 {
-  "method": "execute-cmd",
+  "method": "execute_validation",
   "params": {
     "device": "R1",
     "command": "show ip route 2.2.2.0 255.255.255.252"
@@ -1808,31 +1850,350 @@ The framework uses the Task Evaluation Interface to extract the final running co
 </div>
 </section>
 </div>
-<div id="security-considerations">
+<div id="mcp-based-implementation">
 <section id="section-5">
-      <h2 id="name-security-considerations">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      <h2 id="name-mcp-based-implementation">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-mcp-based-implementation" class="section-name selfRef">MCP-Based Implementation</a>
       </h2>
-<p id="section-5-1">LLM-driven network configuration introduces risks such as unintended or malicious commands, emulator vulnerabilities, and data exposure; to mitigate these, NetConfBench should enforce strict input validation (e.g., YANG/XML schema checks), run emulated devices in isolated sandboxes with limited privileges, encrypt and restrict access to task definitions and logs, employ human-in-the-loop approval for generated configurations, and use curated prompt templates and fine-tuning to reduce LLM hallucinations.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-1">The Model Context Protocol (MCP) provides a standardized approach for implementing the Agent-Network Interface (ANI). This section describes how MCP can be applied to NetConfBench for LLM-driven network configuration evaluation.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<div id="benefits-of-mcp-integration">
+<section id="section-5.1">
+        <h3 id="name-benefits-of-mcp-integration">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-benefits-of-mcp-integration" class="section-name selfRef">Benefits of MCP Integration</a>
+        </h3>
+<p id="section-5.1-1">Integrating MCP into NetConfBench provides several advantages:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-5.1-2">
+<li id="section-5.1-2.1">
+            <p id="section-5.1-2.1.1"><strong>Standardization</strong>: MCP provides a uniform interface for tool invocation across different LLM implementations and network environments.<a href="#section-5.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-5.1-2.2">
+            <p id="section-5.1-2.2.1"><strong>Vendor Abstraction</strong>: The MCP server can handle vendor-specific command translation, allowing the LLM to work with high-level operations without needing detailed knowledge of each vendor's CLI syntax.<a href="#section-5.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-5.1-2.3">
+            <p id="section-5.1-2.3.1"><strong>Tool Extensibility</strong>: New network operations can be easily added as MCP tools without modifying the LLM agent implementation.<a href="#section-5.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-5.1-2.4">
+            <p id="section-5.1-2.4.1"><strong>Traceability</strong>: The structured MCP communication protocol enables detailed logging of all tool invocations and results, facilitating debugging and analysis.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-5.1-2.5">
+            <p id="section-5.1-2.5.1"><strong>Ecosystem Integration</strong>: MCP-enabled network tools can potentially be reused across different AI applications beyond network configuration evaluation.<a href="#section-5.1-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+</section>
+</div>
+<div id="mcp-tool-definitions-for-ani-operations">
+<section id="section-5.2">
+        <h3 id="name-mcp-tool-definitions-for-an">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-mcp-tool-definitions-for-an" class="section-name selfRef">MCP Tool Definitions for ANI Operations</a>
+        </h3>
+<p id="section-5.2-1">This subsection provides the complete MCP tool definitions for the four core Agent-Network Interface operations: <code>get-topology</code>, <code>get-running-cfg</code>, <code>update-cfg</code>, and <code>execute_validation</code>. These definitions use JSON Schema to specify tool parameters and enable LLMs to understand and invoke network operations through the MCP protocol.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<div id="gettopology">
+<section id="section-5.2.1">
+          <h4 id="name-1-get_topology">
+<a href="#section-5.2.1" class="section-number selfRef">5.2.1. </a><a href="#name-1-get_topology" class="section-name selfRef">1. get_topology</a>
+          </h4>
+<p id="section-5.2.1-1">This tool provides network topology information in a format interpretable by the LLM, returning topology for specified devices or the entire network if no devices are specified.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.2.1-2">
+<pre>
+{
+
+  "name": "get_topology",
+  "description": "Retrieve network topology information including
+   nodes and their interconnections. Returns topology for
+   specified devices or entire network if no devices specified.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "devices": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "List of device names. Leave empty for
+        entire network topology."
+      }
+    }
+  }
+}
+</pre><a href="#section-5.2.1-2" class="pilcrow">¶</a>
+</div>
+<p id="section-5.2.1-3"><strong>Usage Example</strong>:<a href="#section-5.2.1-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.2.1-4">
+<pre>
+{
+  "method": "tools/call",
+  "params": {
+    "name": "get_topology",
+    "arguments": {
+      "devices": ["R1", "R2", "R3"]
+    }
+  }
+}
+</pre><a href="#section-5.2.1-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="getrunningconfig">
+<section id="section-5.2.2">
+          <h4 id="name-2-get_running_config">
+<a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-2-get_running_config" class="section-name selfRef">2. get_running_config</a>
+          </h4>
+<p id="section-5.2.2-1">This tool enables the agent to obtain the active configurations of specified devices, providing essential context for planning subsequent updates.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.2.2-2">
+<pre>
+{
+  "name": "get_running_config",
+  "description": "Retrieve the active running configuration
+  from a network device. Returns the complete configuration
+  as a text string.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "device": {
+        "type": "string",
+        "description": "Device name or identifier to retrieve
+         configuration from"
+      }
+    },
+    "required": ["device"]
+  }
+}
+</pre><a href="#section-5.2.2-2" class="pilcrow">¶</a>
+</div>
+<p id="section-5.2.2-3"><strong>Usage Example</strong>:<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.2.2-4">
+<pre>
+{
+  "method": "tools/call",
+  "params": {
+    "name": "get_running_config",
+    "arguments": {
+      "device": "R1"
+    }
+  }
+}
+</pre><a href="#section-5.2.2-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="updateconfig">
+<section id="section-5.2.3">
+          <h4 id="name-3-update_config">
+<a href="#section-5.2.3" class="section-number selfRef">5.2.3. </a><a href="#name-3-update_config" class="section-name selfRef">3. update_config</a>
+          </h4>
+<p id="section-5.2.3-1">This tool allows the agent to apply new configuration commands and provides detailed feedback on their execution, including whether each command was accepted or resulted in any errors.<a href="#section-5.2.3-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.2.3-2">
+<pre>
+{
+  "name": "update_config",
+  "description": "Apply configuration commands to a network
+   device. Executes a sequence of CLI commands and returns
+    detailed status for each command.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "device": {
+        "type": "string",
+        "description": "Device name or identifier to apply
+         configuration to"
+      },
+      "commands": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Ordered list of CLI commands to
+         execute on the device"
+      }
+    },
+    "required": ["device", "commands"]
+  }
+
+}
+
+</pre><a href="#section-5.2.3-2" class="pilcrow">¶</a>
+</div>
+<p id="section-5.2.3-3"><strong>Usage Example</strong>:<a href="#section-5.2.3-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.2.3-4">
+<pre>
+{
+  "method": "tools/call",
+  "params": {
+    "name": "update_config",
+    "arguments": {
+      "device": "R1",
+      "commands": [
+        "configure terminal",
+        "interface GigabitEthernet0/0",
+        "ip address 192.168.1.1 255.255.255.0",
+        "no shutdown"
+      ]
+    }
+  }
+}
+</pre><a href="#section-5.2.3-4" class="pilcrow">¶</a>
+</div>
+<p id="section-5.2.3-5">### 4. execute_cmd<a href="#section-5.2.3-5" class="pilcrow">¶</a></p>
+<p id="section-5.2.3-6">This tool accepts a device name and a read-only command string as parameters and returns the resulting output. It must not alter the device state and is intended for validation and status inspection.<a href="#section-5.2.3-6" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.2.3-7">
+<pre>
+{
+  "name": "execute_validation",
+  "description": "Execute a read-only validation command
+   on a network device to verify configuration or check
+    device status. This command must not alter the
+    device state.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "device": {
+        "type": "string",
+        "description": "Device name or identifier to
+        execute command on"
+      },
+      "command": {
+        "type": "string",
+        "description": "Read-only command to execute
+         (e.g., show commands)"
+      }
+    },
+    "required": ["device", "command"]
+  }
+}
+
+</pre><a href="#section-5.2.3-7" class="pilcrow">¶</a>
+</div>
+<p id="section-5.2.3-8"><strong>Usage Example</strong>:<a href="#section-5.2.3-8" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.2.3-9">
+<pre>
+{
+  "method": "tools/call",
+  "params": {
+    "name": "execute_validation",
+    "arguments": {
+      "device": "R1",
+      "command": "show ip route 2.2.2.0 255.255.255.252"
+    }
+  }
+}
+
+</pre><a href="#section-5.2.3-9" class="pilcrow">¶</a>
+</div>
+<p id="section-5.2.3-10">These four tools form the core MCP interface for NetConfBench. The MCP server must register these tools and handle the translation between MCP tool invocations and actual device communication protocols (CLI, NETCONF, RESTCONF, etc.). The JSON Schema definitions in <code>inputSchema</code> enable LLMs to automatically understand parameter requirements and generate valid tool calls.<a href="#section-5.2.3-10" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="additional-mcp-tools-for-advanced-scenarios">
+<section id="section-5.3">
+        <h3 id="name-additional-mcp-tools-for-ad">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-additional-mcp-tools-for-ad" class="section-name selfRef">Additional MCP Tools for Advanced Scenarios</a>
+        </h3>
+<p id="section-5.3-1">Beyond the four core ANI operations, additional MCP tools can be defined for more complex scenarios. The following examples demonstrate extended tool definitions:<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<div id="batchconfiguredevices">
+<section id="section-5.3.1">
+          <h4 id="name-batch_configure_devices">
+<a href="#section-5.3.1" class="section-number selfRef">5.3.1. </a><a href="#name-batch_configure_devices" class="section-name selfRef">batch_configure_devices</a>
+          </h4>
+<p id="section-5.3.1-1">For batch operations across multiple devices:<a href="#section-5.3.1-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.3.1-2">
+<pre>
+{
+  "name": "batch_configure_devices",
+  "description": "Apply configuration commands to
+   multiple network devices simultaneously",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "device_ips": {
+        "type": "array",
+        "items": {"type": "string"},
+        "description": "List of device IP addresses"
+      },
+      "commands": {
+        "type": "array",
+        "items": {"type": "string"},
+        "description": "CLI command sequence to execute"
+      },
+      "credential_id": {
+        "type": "string",
+        "description": "Authentication credential
+         identifier"
+      }
+    },
+    "required": ["device_ips", "commands"]
+  }
+}
+
+</pre><a href="#section-5.3.1-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="checkdevicestatus">
+<section id="section-5.3.2">
+          <h4 id="name-check_device_status">
+<a href="#section-5.3.2" class="section-number selfRef">5.3.2. </a><a href="#name-check_device_status" class="section-name selfRef">check_device_status</a>
+          </h4>
+<p id="section-5.3.2-1">For comprehensive device health monitoring:<a href="#section-5.3.2-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-5.3.2-2">
+<pre>
+{
+  "name": "check_device_status",
+  "description": "Check operational status of network
+   devices including CPU, memory, and interface metrics",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "device_ip": {
+        "type": "string",
+        "description": "Device IP address to check"
+      },
+      "metrics": {
+        "type": "array",
+        "items": {
+          "enum": ["cpu", "memory", "interface"]
+        },
+        "description": "List of metrics to retrieve"
+      }
+    },
+    "required": ["device_ip", "metrics"]
+  }
+}
+
+</pre><a href="#section-5.3.2-2" class="pilcrow">¶</a>
+</div>
+<p id="section-5.3.2-3">These additional tools demonstrate the extensibility of the MCP approach, allowing the framework to support advanced scenarios such as batch operations and comprehensive device monitoring.<a href="#section-5.3.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-6">
+      <h2 id="name-security-considerations">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-6-1">LLM-driven network configuration introduces risks such as unintended or malicious commands, emulator vulnerabilities, and data exposure; to mitigate these, NetConfBench should enforce strict input validation (e.g., YANG/XML schema checks), run emulated devices in isolated sandboxes with limited privileges, encrypt and restrict access to task definitions and logs, employ human-in-the-loop approval for generated configurations, and use curated prompt templates and fine-tuning to reduce LLM hallucinations. Validation endpoints must enforce read-only execution (e.g., execute-validation) to prevent unintended state changes. Where appropriate, human-in-the-loop approval should gate privileged write operations (update-cfg/update-config) identified as high-impact.<a href="#section-6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-6">
+<section id="section-7">
       <h2 id="name-iana-considerations">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-6-1">This document has no IANA actions.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">This document has no IANA actions.<a href="#section-7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-combined-references">
-<section id="section-7">
+<section id="section-8">
       <h2 id="name-references">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
 <div id="sec-normative-references">
-<section id="section-7.1">
+<section id="section-8.1">
         <h3 id="name-normative-references">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="RFC6241">[RFC6241]</dt>
@@ -1847,9 +2208,9 @@ The framework uses the Task Evaluation Interface to extract the final running co
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-7.2">
+<section id="section-8.2">
         <h3 id="name-informative-references">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="A2023">[A2023]</dt>
