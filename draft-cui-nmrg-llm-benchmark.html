@@ -10,27 +10,26 @@
 <meta content="Xiaohui Xie" name="author">
 <meta content="Chenguang Du" name="author">
 <meta content="
-       This document specifies an evaluation framework and related definitions for intent-driven network configuration using Large Language Model(LLM)–based agents. The framework combines an emulator-based interactive environment, a suite of representative tasks, and multi-dimensional metrics to assess reasoning quality, command accuracy, and functional correctness.  The framework aims to enable reproducible, comprehensive, and fair comparisons among LLM-driven network configuration approaches. 
+       This document specifies an evaluation framework and related definitions for intent-driven network configuration using Large Language Model(LLM)-based agents. The framework combines an emulator-based interactive environment, a suite of representative tasks, and multi-dimensional metrics to assess reasoning quality, command accuracy, and functional correctness.  The framework aims to enable reproducible, comprehensive, and fair comparisons among LLM-driven network configuration approaches. 
     " name="description">
-<meta content="xml2rfc 3.28.1" name="generator">
+<meta content="xml2rfc 3.31.0" name="generator">
 <meta content="Large Language Model" name="keyword">
 <meta content="Network Configuration" name="keyword">
 <meta content="Benchmark" name="keyword">
-<meta content="draft-cui-nmrg-llm-benchmark" name="ietf.draft">
+<meta content="draft-cui-nmrg-llm-benchmark-00" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.28.1
-    Python 3.12.10
+  xml2rfc 3.31.0
+    Python 3.12.12
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
     lxml 5.3.1
-    platformdirs 4.3.8
+    platformdirs 4.5.0
     pycountry 24.6.1
     PyYAML 6.0.2
-    requests 2.32.3
-    setuptools 80.9.0
-    wcwidth 0.2.13
+    requests 2.32.5
+    wcwidth 0.2.14
 -->
 <link href="draft-cui-nmrg-llm-benchmark.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1048,12 +1047,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
-<td class="center">Eval4LLM</td>
-<td class="right">June 2025</td>
+<td class="center">NetConfBench</td>
+<td class="right">October 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Cui, et al.</td>
-<td class="center">Expires 5 December 2025</td>
+<td class="center">Expires 1 May 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,15 +1062,15 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">Network Management Research Group</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-cui-nmrg-llm-benchmark</dd>
+<dd class="internet-draft">draft-cui-nmrg-llm-benchmark-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-06-03" class="published">3 June 2025</time>
+<time datetime="2025-10-28" class="published">28 October 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-12-05">5 December 2025</time></dd>
+<dd class="expires"><time datetime="2026-05-01">1 May 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1096,7 +1095,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">A Framework to Evaluate LLM Agents for Network Configuration</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document specifies an evaluation framework and related definitions for intent-driven network configuration using Large Language Model(LLM)–based agents. The framework combines an emulator-based interactive environment, a suite of representative tasks, and multi-dimensional metrics to assess reasoning quality, command accuracy, and functional correctness.  The framework aims to enable reproducible, comprehensive, and fair comparisons among LLM-driven network configuration approaches.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document specifies an evaluation framework and related definitions for intent-driven network configuration using Large Language Model(LLM)-based agents. The framework combines an emulator-based interactive environment, a suite of representative tasks, and multi-dimensional metrics to assess reasoning quality, command accuracy, and functional correctness.  The framework aims to enable reproducible, comprehensive, and fair comparisons among LLM-driven network configuration approaches.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1105,7 +1104,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
 <p id="section-note.1-2">
         The latest revision of this draft can be found at <span><a href="https://example.com/LATEST">https://example.com/LATEST</a></span>.
-        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-cui-nmrg-llm/">https://datatracker.ietf.org/doc/draft-cui-nmrg-llm/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-cui-nmrg-llm-benchmark/">https://datatracker.ietf.org/doc/draft-cui-nmrg-llm-benchmark/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
         Discussion of this document takes place on the
         WG Working Group mailing list (<span><a href="mailto:WG@example.com">mailto:WG@example.com</a></span>),
@@ -1132,7 +1131,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 5 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 1 May 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1224,16 +1223,16 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">Network configuration is fundamental to ensuring network stability, scalability, and conformance with intended design behavior. Effective configuration requires not only a comprehensive understanding of network technologies but also advanced capabilities for interpreting complex topologies, analyzing dependencies, and specifying parameters accurately.  Traditional automation approaches such as Ansible playbooks<span>[<a href="#A2023" class="cite xref">A2023</a>]</span>, NETCONF<span>[<a href="#RFC6241" class="cite xref">RFC6241</a>]</span>/YANG models<span>[<a href="#RFC7950" class="cite xref">RFC7950</a>]</span>, or program-synthesis methods—either demand extensive manual scripting or are limited to narrow problem domains<span>[<a href="#Kreutz2014" class="cite xref">Kreutz2014</a>]</span>.  In parallel, Large Language Models (LLMs) have demonstrated the ability to interpret natural‐language instructions and generate device‐specific commands, showing promise for intent‐driven automation in networking.  However, existing work remains fragmented and lacks a standardized way to measure whether an LLM can truly operate as an autonomous agent in realistic, multi‐step configuration scenarios.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">Despite encouraging results in individual subtasks, most evaluations<span>[<a href="#Wang2024NetConfEval" class="cite xref">Wang2024NetConfEval</a>]</span> rely on static datasets and ad hoc metrics that do not reflect real‐world complexity.  As a result:
+<p id="section-1-1">Network configuration is fundamental to ensuring network stability, scalability, and conformance with intended design behavior. Effective configuration requires not only a comprehensive understanding of network technologies but also advanced capabilities for interpreting complex topologies, analyzing dependencies, and specifying parameters accurately.  Traditional automation approaches such as Ansible playbooks<span>[<a href="#A2023" class="cite xref">A2023</a>]</span>, NETCONF<span>[<a href="#RFC6241" class="cite xref">RFC6241</a>]</span>/YANG models<span>[<a href="#RFC7950" class="cite xref">RFC7950</a>]</span>, or program-synthesis methods-either demand extensive manual scripting or are limited to narrow problem domains<span>[<a href="#Kreutz2014" class="cite xref">Kreutz2014</a>]</span>.  In parallel, Large Language Models (LLMs) have demonstrated the ability to interpret natural-language instructions and generate device-specific commands, showing promise for intent-driven automation in networking.  However, existing work remains fragmented and lacks a standardized way to measure whether an LLM can truly operate as an autonomous agent in realistic, multi-step configuration scenarios.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Despite encouraging results in individual subtasks, most evaluations<span>[<a href="#Wang2024NetConfEval" class="cite xref">Wang2024NetConfEval</a>]</span> rely on static datasets and ad hoc metrics that do not reflect real-world complexity.  As a result:
 - There is no common benchmark suite covering diverse configuration domains (routing, QoS, security) with clearly defined intents, topologies, and ground truth.
-- Existing tests seldom involve interactive environments that emulate vendor‐specific device behavior or provide runtime feedback on command execution.
+- Existing tests seldom involve interactive environments that emulate vendor-specific device behavior or provide runtime feedback on command execution.
 - Evaluation metrics are often limited to simple syntactic checks or isolated command validation, failing to capture whether the intended network behavior is actually achieved.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">Consequently, it is difficult to compare different LLM approaches or to identify gaps in reasoning, context‐sensitivity, and error‐correction capabilities<span>[<a href="#Long2025" class="cite xref">Long2025</a>]</span><span>[<a href="#Liu2024" class="cite xref">Liu2024</a>]</span><span>[<a href="#Fuad2024" class="cite xref">Fuad2024</a>]</span><span>[<a href="#Lira2024" class="cite xref">Lira2024</a>]</span>.  To address these shortcomings, this document introduce <strong>NetConfBench</strong>, a holistic framework that provides:
-1. An emulator­based environment (built on GNS3) to simulate realistic device interactions.
-2. A benchmark suite of forty tasks spanning multiple domains, each defined by intent, topology, initial state, and expert‐validated ground truth.
-3. Multi­dimensional metrics—<em>reasoning score</em>, <em>command score</em>, and <em>testcase score</em>—that evaluate an agent’s internal reasoning coherence, semantic correctness of generated commands, and functional outcomes in the emulated network.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">NetConfBench aims to enable reproducible, comprehensive comparisons among single­turn LLMs, ReAct­style multi­turn agents, and knowledge­augmented variants, guiding future research toward truly autonomous, intent‐driven network configuration.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-3">Consequently, it is difficult to compare different LLM approaches or to identify gaps in reasoning, context-sensitivity, and error-correction capabilities<span>[<a href="#Long2025" class="cite xref">Long2025</a>]</span><span>[<a href="#Liu2024" class="cite xref">Liu2024</a>]</span><span>[<a href="#Fuad2024" class="cite xref">Fuad2024</a>]</span><span>[<a href="#Lira2024" class="cite xref">Lira2024</a>]</span>.  To address these shortcomings, this document introduce <strong>NetConfBench</strong>, a holistic framework that provides:
+1. An emulatorbased environment (built on GNS3) to simulate realistic device interactions.
+2. A benchmark suite of forty tasks spanning multiple domains, each defined by intent, topology, initial state, and expert-validated ground truth.
+3. Multidimensional metrics-<em>reasoning score</em>, <em>command score</em>, and <em>testcase score</em>-that evaluate an agent's internal reasoning coherence, semantic correctness of generated commands, and functional outcomes in the emulated network.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">NetConfBench aims to enable reproducible, comprehensive comparisons among singleturn LLMs, ReActstyle multiturn agents, and knowledge-augmented variants, guiding future research toward truly autonomous, intent-driven network configuration.<a href="#section-1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="terminology">
@@ -1260,7 +1259,7 @@ are defined:<a href="#section-2-1" class="pilcrow">¶</a></p>
           <p id="section-2-2.5.1">Task: A single evaluation unit defined by (1) a scenario category, (2) an environment topology, (3) initial device configurations, and (4) an intent. The agent is evaluated on its ability to fulfill the intent in the given environment.<a href="#section-2-2.5.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-2-2.6">
-          <p id="section-2-2.6.1">Testcase: A concrete, executable set of verification steps (e.g., ping tests, traffic-flow validation, policy checks) used to assert whether the agent’s final configuration satisfies the intent.<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.6.1">Testcase: A concrete, executable set of verification steps (e.g., ping tests, traffic-flow validation, policy checks) used to assert whether the agent's final configuration satisfies the intent.<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
@@ -1304,7 +1303,7 @@ Legend:
 Figure 1: The NetConfBench Framework
 </pre><a href="#section-3-1" class="pilcrow">¶</a>
 </div>
-<p id="section-3-2">The proposed framework is shown in Figure 1. The flow begins with a <strong>Task Dataset</strong> defining network intents and topologies. The <strong>LLM Agent</strong> perceives the environment, reasons about required actions, and applies configuration commands. The <strong>Environment</strong> simulates or controls real devices, providing feedback for each action. Finally, the <strong>Evaluator</strong> compares the agent’s outputs against ground-truth configurations and reasoning, computing scores for accuracy and completion.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-2">The proposed framework is shown in Figure 1. The flow begins with a <strong>Task Dataset</strong> defining network intents and topologies. The <strong>LLM Agent</strong> perceives the environment, reasons about required actions, and applies configuration commands. The <strong>Environment</strong> simulates or controls real devices, providing feedback for each action. Finally, the <strong>Evaluator</strong> compares the agent's outputs against ground-truth configurations and reasoning, computing scores for accuracy and completion.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <div id="components">
 <section id="section-3.1">
         <h3 id="name-components">
@@ -1361,10 +1360,10 @@ subsequent updates.<a href="#section-3.1-2.2.2.1.2.2.1" class="pilcrow">¶</a></
                 </ul>
 </li>
               <li class="normal" id="section-3.1-2.2.2.2">
-                <p id="section-3.1-2.2.2.2.1"><strong>Task Evaluation Interface</strong>: To enable reliable and objective assessment of the LLM agent’s configuration behavior, the environment provides a Task Evaluation Interface that allows the evaluation module to access relevant execution results. Specifically, this interface supports:<a href="#section-3.1-2.2.2.2.1" class="pilcrow">¶</a></p>
+                <p id="section-3.1-2.2.2.2.1"><strong>Task Evaluation Interface</strong>: To enable reliable and objective assessment of the LLM agent's configuration behavior, the environment provides a Task Evaluation Interface that allows the evaluation module to access relevant execution results. Specifically, this interface supports:<a href="#section-3.1-2.2.2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-2.2.2.2.2.1">
-                    <p id="section-3.1-2.2.2.2.2.1.1"><strong>Exporting the final configurations of all devices</strong>: This allows for direct comparison with ground truth configurations to evaluate the correctness and completeness of the agent’s output.<a href="#section-3.1-2.2.2.2.2.1.1" class="pilcrow">¶</a></p>
+                    <p id="section-3.1-2.2.2.2.2.1.1"><strong>Exporting the final configurations of all devices</strong>: This allows for direct comparison with ground truth configurations to evaluate the correctness and completeness of the agent's output.<a href="#section-3.1-2.2.2.2.2.1.1" class="pilcrow">¶</a></p>
 </li>
                   <li class="normal" id="section-3.1-2.2.2.2.2.2">
                     <p id="section-3.1-2.2.2.2.2.2.1"><strong>Executing a set of predefined testcases</strong>: These testcases are designed to verify whether the resulting network behavior accurately reflects the intended configuration objectives, as defined by the network intent.<a href="#section-3.1-2.2.2.2.2.2.1" class="pilcrow">¶</a></p>
@@ -1396,7 +1395,7 @@ Computes three core metrics for each task:<a href="#section-3.1-2.4.1" class="pi
                 <p id="section-3.1-2.4.2.1.1"><strong>Reasoning Score (<code>S_reasoning</code>)</strong>:<a href="#section-3.1-2.4.2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-2.4.2.1.2.1">
-                    <p id="section-3.1-2.4.2.1.2.1.1">Embedding-based cosine similarity between the agent’s reasoning trace and the ground truth reasoning.<a href="#section-3.1-2.4.2.1.2.1.1" class="pilcrow">¶</a></p>
+                    <p id="section-3.1-2.4.2.1.2.1.1">Embedding-based cosine similarity between the agent's reasoning trace and the ground truth reasoning.<a href="#section-3.1-2.4.2.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
                   <li class="normal" id="section-3.1-2.4.2.1.2.2">
                     <p id="section-3.1-2.4.2.1.2.2.1">Ranges from 0 to 1.<a href="#section-3.1-2.4.2.1.2.2.1" class="pilcrow">¶</a></p>
@@ -1407,7 +1406,7 @@ Computes three core metrics for each task:<a href="#section-3.1-2.4.1" class="pi
                 <p id="section-3.1-2.4.2.2.1"><strong>Command Score (<code>S_command</code>)</strong>:<a href="#section-3.1-2.4.2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-2.4.2.2.2.1">
-                    <p id="section-3.1-2.4.2.2.2.1.1">Hierarchical diff of final vs. initial router configurations (using Python’s <code>ciscoconfparse</code>).<a href="#section-3.1-2.4.2.2.2.1.1" class="pilcrow">¶</a></p>
+                    <p id="section-3.1-2.4.2.2.2.1.1">Hierarchical diff of final vs. initial router configurations (using Python's <code>ciscoconfparse</code>).<a href="#section-3.1-2.4.2.2.2.1.1" class="pilcrow">¶</a></p>
 </li>
                   <li class="normal" id="section-3.1-2.4.2.2.2.2">
                     <p id="section-3.1-2.4.2.2.2.2.1">Wildcard matching ignores non-essential identifiers (e.g., ACL numbers).<a href="#section-3.1-2.4.2.2.2.2.1" class="pilcrow">¶</a></p>
@@ -1452,7 +1451,7 @@ NetConfBench selects a task from the JSON dataset and provides only the high-lev
 </li>
           <li id="section-3.2-2.2">
             <p id="section-3.2-2.2.1"><strong>Environment Setup</strong><br>
-The framework instantiates a GNS3 topology based on the task’s <code>topology</code> and applies the <code>startup-config</code> to each device.  Once the emulated network reaches a stable state, control transfers to the agent.<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
+The framework instantiates a GNS3 topology based on the task's <code>topology</code> and applies the <code>startup-config</code> to each device.  Once the emulated network reaches a stable state, control transfers to the agent.<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-3.2-2.3">
             <p id="section-3.2-2.3.1"><strong>Interactive Execution</strong><br>
@@ -1472,10 +1471,10 @@ The agent issues a sequence of API calls; for single-turn agents, it outputs rea
 </li>
           <li id="section-3.2-2.4">
             <p id="section-3.2-2.4.1"><strong>Reasoning Trajectory Export</strong><br>
-After execution completes (agent signals “task done” or after a predefined command budget), NetConfBench captures the entire reasoning log:<a href="#section-3.2-2.4.1" class="pilcrow">¶</a></p>
+After execution completes (agent signals "task done" or after a predefined command budget), NetConfBench captures the entire reasoning log:<a href="#section-3.2-2.4.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2-2.4.2.1">
-                <p id="section-3.2-2.4.2.1.1">For single-turn: the reasoning paragraph embedded in the LLM’s output.<a href="#section-3.2-2.4.2.1.1" class="pilcrow">¶</a></p>
+                <p id="section-3.2-2.4.2.1.1">For single-turn: the reasoning paragraph embedded in the LLM's output.<a href="#section-3.2-2.4.2.1.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-3.2-2.4.2.2">
                 <p id="section-3.2-2.4.2.2.1">For ReAct: an auxiliary summarization LLM condenses the interleaved reasoning and actions into a single coherent trace.<a href="#section-3.2-2.4.2.2.1" class="pilcrow">¶</a></p>
@@ -1496,7 +1495,7 @@ The framework uses the Task Evaluation Interface to extract the final running co
                 <p id="section-3.2-2.6.2.2.1"><strong>Testcase Score:</strong> Execute each testcase in sequence; record pass/fail.<a href="#section-3.2-2.6.2.2.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-3.2-2.6.2.3">
-                <p id="section-3.2-2.6.2.3.1"><strong>Reasoning Score:</strong> Compute embedding similarity between the agent’s reasoning trace and ground truth reasoning.<a href="#section-3.2-2.6.2.3.1" class="pilcrow">¶</a></p>
+                <p id="section-3.2-2.6.2.3.1"><strong>Reasoning Score:</strong> Compute embedding similarity between the agent's reasoning trace and ground truth reasoning.<a href="#section-3.2-2.6.2.3.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </li>
@@ -1630,7 +1629,11 @@ The framework uses the Task Evaluation Interface to extract the final running co
 <div class="lang-json sourcecode" id="section-4.2-2.2.2.2.2">
 <pre>
 {
-  "running_config": "interface Gig0/0\n ip address 192.168.1.1 255.255.255.252\n..."
+  "running_config": "
+   interface Gig0/0
+   ip address 192.168.1.1 255.255.255.255
+   ...
+  "
 }
 </pre><a href="#section-4.2-2.2.2.2.2" class="pilcrow">¶</a>
 </div>
@@ -1667,7 +1670,9 @@ The framework uses the Task Evaluation Interface to extract the final running co
 {
   "results": [
     { "command": "configure terminal", "status": "success" },
-    { "command": "ip route 2.2.2.0 255.255.255.252 192.168.1.2", "status": "success" }
+    {
+    "command": "ip route 2.2.2.0 255.255.255.252 192.168.1.2",
+    "status": "success" }
   ]
 }
 </pre><a href="#section-4.2-2.3.2.2.2" class="pilcrow">¶</a>
@@ -1780,8 +1785,14 @@ The framework uses the Task Evaluation Interface to extract the final running co
 <pre>
 {
   "results": [
-    { "name": "Verify primary static route on R1", "status": "pass" },
-    { "name": "Verify backup static route on R1", "status": "fail" }
+    {
+      "name": "Verify primary static route on R1",
+      "status": "pass"
+    },
+    {
+      "name": "Verify backup static route on R1",
+      "status": "fail"
+    }
   ]
 }
 </pre><a href="#section-4.3-2.2.2.2.2" class="pilcrow">¶</a>
