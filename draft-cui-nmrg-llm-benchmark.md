@@ -91,6 +91,8 @@ author:
   email: ducg@zgclab.edu.cn
 
 normative:
+  RFC2119:
+  RFC8174:
   RFC6241:
   RFC7950:
   
@@ -154,13 +156,19 @@ informative:
     - name: Dejan Kostic
     - name: Marco Chiesa
     date: 2024
+  GSMA2025:
+    title: "GSMA Open-Telco LLM Benchmarks"
+    author:
+    - org: GSMA Foundry
+    date: 2025
+    target: https://www.gsma.com/get-involved/gsma-foundry/gsma-open-telco-llm-benchmarks/
   
 
 ...
 
 --- abstract
 
-This document specifies an evaluation framework and related definitions for intent-driven network configuration using Large Language Model(LLM)-based agents. The framework combines an emulator-based interactive environment, a suite of representative tasks, and multi-dimensional metrics to assess reasoning quality, command accuracy, and functional correctness.  The framework aims to enable reproducible, comprehensive, and fair comparisons among LLM-driven network configuration approaches.
+This document specifies an evaluation framework and related definitions for intent-driven network configuration using Large Language Model(LLM)-based agents. The framework combines an emulator-based interactive environment, a suite of representative tasks, and multi-dimensional metrics organized in two layers: outcome metrics that verify functional correctness in a method-agnostic way, and agentic process metrics that assess reasoning quality and interactive command generation. Functional testcase results serve as the primary metric; command and reasoning scores act as diagnostic estimates against the task's ground truth configurations (which may include more than one validated solution), and optional efficiency metrics capture time and token cost. The framework aims to enable reproducible, comprehensive, and fair comparisons among network configuration approaches, covering both agentic and non-agentic solutions while highlighting capabilities specific to autonomous agents.
 
 --- middle
 
@@ -175,12 +183,24 @@ Despite encouraging results in individual subtasks, most evaluations{{Wang2024Ne
 
 Consequently, it is difficult to compare different LLM approaches or to identify gaps in reasoning, context-sensitivity, and error-correction capabilities{{Long2025}}{{Liu2024}}{{Fuad2024}}{{Lira2024}}.  To address these shortcomings, this document introduce **NetConfBench**, a holistic framework that provides:
 1. An emulator-based environment (built on GNS3) to simulate realistic device interactions.
-2. A benchmark suite of forty tasks spanning routing, QoS, and security, each defined by intent, topology, initial state, ground-truth configuration, annotated reasoning trace, and expert-crafted testcases.
-3. Multidimensional metrics-*reasoning score*, *command score*, and *testcase score*-that evaluate an agent's internal reasoning coherence, semantic correctness of generated commands, and functional outcomes in the emulated network.
+2. A benchmark suite of forty tasks spanning routing, QoS, and security, each defined by intent, topology, initial state, a set of one or more ground truth configurations (each with an annotated reasoning trace), and expert-crafted testcases.
+3. Multidimensional metrics organized in two layers: a primary *testcase score* that verifies functional outcomes in the emulated network; diagnostic *command score* and *reasoning score* that estimate the semantic correctness of generated commands and the coherence of internal reasoning against the task's ground truth configurations, in particular when testcases fail; and optional *efficiency metrics* such as wall-clock time and token consumption.
 
 NetConfBench aims to enable reproducible, comprehensive comparisons among single-turn LLMs, ReAct-style multiturn agents, and knowledge-augmented variants, guiding future research toward truly autonomous, intent-driven network configuration.
 
+## Scope and Applicability to Agentic Approaches
+
+While this document focuses on LLM-based agents, the framework is deliberately layered so that it is not limited to agentic solutions. The emulated environment, the task definitions, and the testcase-based outcome evaluation are method-agnostic: any configuration approach, including traditional automation scripts, template-based systems, or single-shot LLM generation, can be executed against the same tasks and scored on the outcome metrics, and can therefore serve as a baseline.
+
+The agent-specific value of the framework lies in the process layer. The interactive Agent-Network Interface, multi-turn feedback from live emulated devices, and the process metrics (reasoning coherence, interactive error correction, and efficiency under a step budget) capture capabilities that only apply to systems that autonomously perceive network state, plan, act, and revise their actions. This layered design allows agentic and non-agentic solutions to be compared directly on the same tasks, while making explicit which measured capabilities are specific to autonomous agents.
+
 # Terminology
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in
+BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all
+capitals, as shown here.
 
 For clarity within this document, the following terms and abbreviations
 are defined:
@@ -197,6 +217,8 @@ are defined:
 
 - Testcase: A concrete, executable set of verification steps (e.g., ping tests, traffic-flow validation, policy checks) used to assert whether the agent's final configuration satisfies the intent.
 
+- Ground Truth Configurations: The set of one or more validated solutions defined for a task, each pairing a device-level command set with a reasoning trace. Since different configurations can achieve the same intended network behavior, a task's ground truth configurations MAY contain more than one solution, including solutions harvested from evaluation runs that passed all testcases.
+
 - MCP (Model Context Protocol): An open standard protocol designed to facilitate communication between LLMs and external data sources or tools, enabling standardized tool discovery, invocation, and result handling.
 
 # Framework Overview
@@ -209,30 +231,35 @@ are defined:
     |||Routing |      ||    |           |    ||Trajectory| |Reasoning ||
     |||Policy  | +---+||    +-----------+    |+----------+ +----------+|
     ||+--------+ |QoS|||          |          |     \             /     |
-    ||+--------+ +---+||          |          |      Rouge/Cos. Sim.    |
+    ||+--------+ +---+||          |          |  Rouge/Cos.Sim. (diag)  |
     |||Security|      ||         (3)         |                         |
     ||+--------+      ||          |          |+----------+ +----------+|
     |+----------------+|          |       (5)|| Final    | |Grnd Truth||
     |+----------------+|          |        +->| Configs  | |Configs   ||
     ||Network Topology||    +-----------+  | |+----------+ +----------+|
     ||+-----+ +-----+ ||(2) |Environment|  | |     \             /     |
-    |||Nodes| |Links| |---->|           |-+  |    Precision/Recall     |
+    |||Nodes| |Links| |---->|           |-+  | Precision/Recall (diag) |
     ||+-----+ +-----+ ||    | R2 --- R1 |    |                         |
     |+----------------+|    | |(GNS3)|  |(6) | +---------------------+ |
     |                  |    | R3 --- R4 |<-->| |     Testcases       | |
     |+----------------+|(2) |           |    | +---------------------+ |
     ||Initial Configs |---->| Emulator- |    |            |            |
-    |+----------------+|    |  based    |    |        Pass Rate        |
+    |+----------------+|    |  based    |    |   Pass Rate (primary)   |
+    |                  |    |           |    |  Efficiency (optional)  |
     +------------------+    +-----------+    +-------------------------+
+            ^                                            |
+            |                                            |
+            +--------(7) Validated-Run Harvesting--------+
 
     Legend:
     (1)Task Assignment             (2)Environment Setup
     (3)Interactive Task Execution  (4)Reasoning Trajectory Export
     (5)Final Configuration Export  (6)Testcase Execution
+    (7)Validated-Run Harvesting
 
     Figure 1: The NetConfBench Framework
 
-The proposed framework is shown in Figure 1. The flow begins with a **Task Dataset** defining network intents and topologies. The **LLM Agent** perceives the environment, reasons about required actions, and applies configuration commands. The **Environment** simulates or controls real devices, providing feedback for each action. Finally, the **Evaluator** compares the agent's outputs against ground-truth configurations and reasoning, computing scores for accuracy and completion.
+The proposed framework is shown in Figure 1. The flow begins with a **Task Dataset** defining network intents and topologies. The **LLM Agent** perceives the environment, reasons about required actions, and applies configuration commands. The **Environment** simulates or controls real devices, providing feedback for each action. Finally, the **Evaluator** verifies functional outcomes through testcases and compares the agent's outputs against the task's ground truth configurations (validated solutions with their reasoning traces), computing scores for accuracy and completion.
 
 The framework supports multiple communication protocols for agent-environment interaction, including direct API calls and standardized protocols such as MCP. When using MCP, network operations are encapsulated as tools that can be discovered and invoked by the LLM agent through the MCP client-server architecture.
 
@@ -245,8 +272,7 @@ NetConfBench consists of four key components:
    - **Intent**: One or more natural language instructions.  
    - **Topology**: A list of node names and link definitions.  
    - **Initial Configuration**: The initial configuration state of all nodes.  
-   - **Ground Truth Configuration**: Expert-validated CLI commands that achieve the intent.  
-   - **Ground Truth Reasoning**: A textual record of the agent's step-by-step reasoning that maps high-level intent to low-level configuration actions.
+   - **Ground Truth Configurations**: A non-empty set of validated solutions that achieve the intent. Each solution pairs expert-validated (or later, harvested and validated) CLI commands with its own reasoning trace mapping high-level intent to low-level configuration actions. A task typically starts with a single expert-authored solution and MAY accumulate further solutions over time.
    - **Testcases**: A set of verification procedures (e.g., *show*, *ping*, *ACL* checks) that confirm functional intent satisfaction.  
 
 2. **Emulator Environment**  
@@ -268,7 +294,7 @@ NetConfBench consists of four key components:
    - **External Knowledge Retrieval**: (Optional) Queries to a command manual to resolve vendor-specific syntax.
 
 4. **Evaluator**  
-   Computes three core metrics for each task:  
+   Computes metrics organized in two layers for each task. The **testcase score** is the primary outcome metric: it directly verifies whether the intended network behavior is achieved and is insensitive to which of several valid configurations the agent chose. The **command score** and **reasoning score** are diagnostic process metrics computed against the task's ground truth configurations; they are especially useful for estimating partial credit and analyzing failure causes when testcases do not pass. When a run passes all testcases, it is considered functionally correct regardless of how far its commands or reasoning diverge from the existing ground truth configurations, and the diagnostic scores are reported for analysis only. Optional efficiency metrics complement these accuracy-oriented scores. The core metrics are defined as follows:
 
    - **Reasoning Score (`S_reasoning`)**
 
@@ -281,13 +307,13 @@ NetConfBench consists of four key components:
       S_reasoning = (r_agent * r_gt) / (||r_agent|| * ||r_gt||)
       ```
 
-      where r_agent is the embedding of the agent's reasoning process, and r_gt is the embedding of the ground truth reasoning process.
+      where r_agent is the embedding of the agent's reasoning process, and r_gt is the embedding of the ground truth reasoning process. When a task's ground truth configurations contain multiple solutions, the similarity is computed against the reasoning trace of each solution and the maximum value is reported, so that an agent choosing a valid alternative approach is not penalized.
 
    - **Command Score (`S_command`)**
      
      This evaluation comprehensively assesses the effectiveness of configuration commands generated by the agent. While syntactic correctness is a prerequisite, it does not ensure that configuration commands are correctly applied to the device, particularly when commands must be issued within specific configuration contexts.
      
-     After the agent completes its configuration task, the final configurations of all devices are exported and compared to their initial configurations to extract the set of commands that were actually applied. Hierarchical parsing using the Python library `ciscoconfparse` ensures structural completeness during comparison. Since certain configuration parameters (e.g., ACL numbers, route policy names) are manually defined and do not have fixed values, wildcard-based fuzzy matching is introduced to ignore non-essential differences and focus on semantic equivalence.
+     After the agent completes its configuration task, the final configurations of all devices are exported and compared to their initial configurations to extract the set of commands that were actually applied. Hierarchical parsing using the Python library `ciscoconfparse` ensures structural completeness during comparison. Since certain configuration parameters (e.g., ACL numbers, route policy names) are manually defined and do not have fixed values, wildcard-based fuzzy matching is introduced to ignore non-essential differences and focus on semantic equivalence. When a task's ground truth configurations contain multiple solutions, precision and recall are computed against the command set of each solution and the best (maximum) harmonic mean is reported.
      
      Based on the extracted command sets, standard precision and recall are computed:
      - Precision measures the proportion of correctly generated commands among all generated commands
@@ -317,9 +343,19 @@ NetConfBench consists of four key components:
 
      This score reflects the agent's ability to produce configurations that meet functional requirements and demonstrates practical applicability in real-world deployment scenarios.
 
+   - **Efficiency Metrics (Optional)**
+
+     In addition to the accuracy-oriented scores above, the framework records optional efficiency and cost indicators for each run:
+
+     - **Wall-clock time**: elapsed time from task assignment to task completion signal.
+     - **Token consumption**: total prompt and completion tokens consumed by the LLM, which approximates the monetary cost of a run.
+     - **Interaction footprint**: the number of interaction rounds and tool/API invocations issued through the Agent-Network Interface.
+
+     These metrics do not affect correctness scoring. They are reported as reference indicators alongside the core scores, enabling cost-aware comparison between approaches (e.g., a solution that achieves the same testcase score with substantially fewer tokens or less time) and revealing how interface design and skill/knowledge augmentation affect agent efficiency.
+
 ## Workflow
 
-The evaluation workflow for each task proceeds through six stages:
+The evaluation workflow for each task proceeds through seven stages:
 
 1. **Task Assignment**  
    NetConfBench selects a task from the JSON dataset and provides only the high-level intent(s) to the LLM agent.
@@ -344,11 +380,17 @@ The evaluation workflow for each task proceeds through six stages:
    The framework uses the Task Evaluation Interface to extract the final running configs from each device.
 
 6. **Testcase Execution and Scoring**  
-   - **Command Score:** Hierarchical diff against ground truth commands.  
-   - **Testcase Score:** Execute each testcase in sequence; record pass/fail.  
-   - **Reasoning Score:** Compute embedding similarity between the agent's reasoning trace and ground truth reasoning.
+   - **Testcase Score (primary):** Execute each testcase in sequence; record pass/fail.
+   - **Command Score (diagnostic):** Hierarchical diff against the best-matching solution in the task's ground truth configurations.
+   - **Reasoning Score (diagnostic):** Compute embedding similarity between the agent's reasoning trace and the reasoning trace(s) of the ground truth configurations.
+   - **Efficiency Metrics (optional):** Record wall-clock time, token consumption, and interaction footprint for the run.
 
-The final per-task score is typically reported as a tuple `(S_reasoning, S_command, S_testcase)`.  Aggregate results across the forty tasks enable comparisons among LLMs and interaction strategies.
+   If all testcases pass, the run is deemed functionally correct and the diagnostic scores are reported for analysis only. If one or more testcases fail, the command and reasoning scores serve as an estimated partial-credit signal and support diagnosis of where the agent deviated from a valid solution.
+
+7. **Validated-Run Harvesting (Feedback Loop)**
+   If a run passes all testcases but its applied command set differs substantially from every existing solution in the task's ground truth configurations, the framework captures the run's command record and reasoning trace as a candidate solution and adds it to the task's `ground_truth_configs` with provenance metadata (see the Data Model section). Over time, this feedback loop accumulates the space of valid alternative solutions for each task, mitigating single-ground-truth bias in subsequent evaluations of both the command score and the reasoning score.
+
+The final per-task result is reported with `S_testcase` as the primary score, accompanied by the diagnostic pair `(S_reasoning, S_command)` and, where recorded, the optional efficiency metrics.  Aggregate results across the forty tasks enable comparisons among LLMs and interaction strategies.
 
 # Data Model
 
@@ -363,7 +405,7 @@ Each configuration task is defined as a JSON object with the following structure
   "task_name": "Static Routing",
   "intents": [
     "NewYork: create a static route pointing to the Loopback0 on
-    Washington, traffic should pass the 192.168.1.0 network.",
+    Washington, traffic should pass the 192.0.2.0 network.",
     "NewYork: create a backup static route pointing to the Loopback0
     on Washington, administrative distance should be 100."
     ...
@@ -381,29 +423,57 @@ Each configuration task is defined as a JSON object with the following structure
     "Washington": "!\r\nversion 12.4\r\nservice timestamps
     debug datetime msec\r\n...",
   },
-  "ground_truth_configs": {
-    "NewYork": [
-      "ip route 2.2.2.0 255.255.255.252 192.168.1.2",
-      "ip route 2.2.2.0 255.255.255.252 192.168.2.2 100"
-    ],
-    ...
-  },
-  "ground_truth_reasoning": "NewYork to Washington Loopback 
-  (primary path): add a static route for Washington's 
-  Loopback0 network (2.2.2.0/30) pointing to the 
-  next-hop 192.168.1.2...",
+  "ground_truth_configs": [
+    {
+      "solution_id": "expert-0001",
+      "configs": {
+        "NewYork": [
+          "ip route 203.0.113.0 255.255.255.252 192.0.2.2",
+          "ip route 203.0.113.0 255.255.255.252 198.51.100.2 100"
+        ],
+        ...
+      },
+      "reasoning": "NewYork to Washington Loopback
+      (primary path): add a static route for Washington's
+      Loopback0 network (203.0.113.0/30) pointing to the
+      next-hop 192.0.2.2...",
+      "provenance": "expert-authored"
+    },
+    {
+      "solution_id": "harvested-0007",
+      "configs": {
+        "NewYork": [
+          "ip route 203.0.113.0 255.255.255.252 Serial0/0",
+          "ip route 203.0.113.0 255.255.255.252 Serial0/1 100"
+        ],
+        ...
+      },
+      "reasoning": "Use exit-interface static routes over the
+      serial links instead of next-hop addresses...",
+      "provenance": "harvested-from-validated-run"
+    }
+  ],
   "testcases": [
     {
       "name": "Static Route from NewYork to Washington",
       "expected_result": {
         "protocol": "static", 
-        "next_hop": "192.168.1.2"
+        "next_hop": "192.0.2.2"
       }
     },
     ...
   ]
 }
 ~~~
+
+Because a given intent may be satisfied by multiple distinct configurations, `ground_truth_configs` is defined as a non-empty array of solutions rather than a single command set. Each solution carries:
+
+- `solution_id`: a unique identifier within the task.
+- `configs`: per-device command sets that achieve the intent.
+- `reasoning`: a textual record of the step-by-step reasoning that maps the intent to the commands in `configs`.
+- `provenance`: how the solution was obtained, e.g., `expert-authored` or `harvested-from-validated-run`.
+
+A task typically starts with a single `expert-authored` solution. Additional solutions harvested from evaluation runs (see the Workflow section) are appended to the same array once a run has passed all testcases, growing the set of known-valid solutions for the task over time.
 
 ## Agent-Network Interface (ANI)
 
@@ -452,7 +522,7 @@ The Agent-Network Interface defines the minimal API primitives necessary for int
      {
        "running_config": "
         interface Gig0/0
-        ip address 192.168.1.1 255.255.255.255
+        ip address 192.0.2.1 255.255.255.255
         ...
        "
      }
@@ -470,7 +540,7 @@ The Agent-Network Interface defines the minimal API primitives necessary for int
          "device": "R1",
          "commands": [
            "configure terminal",
-           "ip route 2.2.2.0 255.255.255.252 192.168.1.2"
+           "ip route 203.0.113.0 255.255.255.252 192.0.2.2"
          ]
        }
      }
@@ -482,9 +552,9 @@ The Agent-Network Interface defines the minimal API primitives necessary for int
      {
        "results": [
          { "command": "configure terminal", "status": "success" },
-         { 
-         "command": "ip route 2.2.2.0 255.255.255.252 192.168.1.2", 
-         "status": "success" }
+         { "command":
+             "ip route 203.0.113.0 255.255.255.252 192.0.2.2",
+           "status": "success" }
        ]
      }
      ~~~
@@ -499,7 +569,7 @@ The Agent-Network Interface defines the minimal API primitives necessary for int
        "method": "execute_validation",
        "params": {
          "device": "R1",
-         "command": "show ip route 2.2.2.0 255.255.255.252"
+         "command": "show ip route 203.0.113.0 255.255.255.252"
        }
      }
      ~~~
@@ -508,7 +578,7 @@ The Agent-Network Interface defines the minimal API primitives necessary for int
 
      ~~~ json
      {
-       "output": "S 2.2.2.0/30 [1/0] via 192.168.1.2"
+       "output": "S 203.0.113.0/30 [1/0] via 192.0.2.2"
      }
      ~~~
     
@@ -550,8 +620,11 @@ After the agent signals completion, the framework uses the Task Evaluation Inter
         "testcases": [
           {
             "device": "R1",
-            "commands": ["show ip route 2.2.2.0 255.255.255.252"],
-            "expected_output": "S 2.2.2.0/30 [1/0] via 192.168.1.2"
+            "commands": [
+              "show ip route 203.0.113.0 255.255.255.252"
+            ],
+            "expected_output":
+              "S 203.0.113.0/30 [1/0] via 192.0.2.2"
           },
           ...
         ]
@@ -577,6 +650,22 @@ After the agent signals completion, the framework uses the Task Evaluation Inter
     ~~~
     
   - **Description**: Executes each verification command sequence on the appropriate device and compares actual output against `expected_output` (regular expression).  Returns pass/fail for each testcase.
+
+# Dataset Contribution and Interoperability
+
+The initial NetConfBench dataset of forty tasks is intentionally modest in size. Rather than positioning the task schema as a private format tied to a single dataset, this document proposes it as a candidate exchange format for benchmarks of LLM/agent-driven network configuration, together with a lightweight process for community contribution. The goal is not a single dataset but a set of interoperable datasets that share a common notion of what a task, a validated solution, and a verifiable outcome are.
+
+## Task Schema as an Exchange Format
+
+The JSON task schema defined in the Data Model section captures the minimal elements that emulator-based configuration evaluation requires: an intent, a topology, an initial state, one or more ground truth configurations, and executable testcases. Existing datasets from other efforts can be imported by mapping their scenarios onto these elements; the mandatory fields are the intent, the topology, and the testcases, while additional ground truth configurations and their reasoning traces are optional and can be added incrementally (including through the validated-run harvesting loop described in the Workflow section). Conversely, NetConfBench tasks can be exported to other evaluation harnesses that consume intent/topology/verification triples. Future revisions may additionally support YANG-based topology and service representations to improve alignment with IETF data models.
+
+## Contribution Process
+
+A formal contribution process (submission templates, acceptance criteria, and a dataset versioning policy) is future work and will be specified in a subsequent revision of this document, informed by feedback from the NMRG and NMOP communities and by alignment with the GSMA Open-Telco LLM Benchmarks community.
+
+## Relationship to Other Benchmarking Efforts
+
+This framework is complementary to other community benchmarking efforts for AI in networking, in particular the GSMA Open-Telco LLM Benchmarks community, which evaluates models against operator-submitted telecom use cases with an emphasis on domain knowledge, safety, and energy efficiency. Those benchmarks are largely centered on knowledge- and analysis-oriented tasks, whereas NetConfBench provides an interactive, emulator-based environment that evaluates configuration actions and their functional outcomes. The two are natural counterparts: operator-submitted use cases can be turned into NetConfBench tasks through the exchange format above, and NetConfBench tasks and results can in turn be contributed to such communities {{GSMA2025}}. The authors intend to pursue this alignment so that datasets for LLM/agent network configuration converge on shared expectations rather than fragmenting across efforts.
 
 # MCP-Based Implementation
 
@@ -731,7 +820,7 @@ This tool allows the agent to apply new configuration commands and provides deta
       "commands": [
         "configure terminal",
         "interface GigabitEthernet0/0",
-        "ip address 192.168.1.1 255.255.255.0",
+        "ip address 192.0.2.1 255.255.255.0",
         "no shutdown"
       ]
     }
@@ -740,7 +829,7 @@ This tool allows the agent to apply new configuration commands and provides deta
 ~~~
 ### 4. execute_cmd
 
-This tool accepts a device name and a read-only command string as parameters and returns the resulting output. It must not alter the device state and is intended for validation and status inspection.
+This tool accepts a device name and a read-only command string as parameters and returns the resulting output. It MUST NOT alter the device state and is intended for validation and status inspection.
 
 ~~~ json
 
@@ -780,14 +869,14 @@ This tool accepts a device name and a read-only command string as parameters and
     "name": "execute_validation",
     "arguments": {
       "device": "R1",
-      "command": "show ip route 2.2.2.0 255.255.255.252"
+      "command": "show ip route 203.0.113.0 255.255.255.252"
     }
   }
 }
 
 ~~~
 
-These four tools form the core MCP interface for NetConfBench. The MCP server must register these tools and handle the translation between MCP tool invocations and actual device communication protocols (CLI, NETCONF, RESTCONF, etc.). The JSON Schema definitions in `inputSchema` enable LLMs to automatically understand parameter requirements and generate valid tool calls.
+These four tools form the core MCP interface for NetConfBench. The MCP server MUST register these tools and handle the translation between MCP tool invocations and actual device communication protocols (CLI, NETCONF, RESTCONF, etc.). The JSON Schema definitions in `inputSchema` enable LLMs to automatically understand parameter requirements and generate valid tool calls.
 
 ## Additional MCP Tools for Advanced Scenarios
 
@@ -863,7 +952,7 @@ These additional tools demonstrate the extensibility of the MCP approach, allowi
 
 # Security Considerations
 
-LLM-driven network configuration introduces risks such as unintended or malicious commands, emulator vulnerabilities, and data exposure; to mitigate these, NetConfBench should enforce strict input validation (e.g., YANG/XML schema checks), run emulated devices in isolated sandboxes with limited privileges, encrypt and restrict access to task definitions and logs, employ human-in-the-loop approval for generated configurations, and use curated prompt templates and fine-tuning to reduce LLM hallucinations. Validation endpoints must enforce read-only execution (e.g., execute-validation) to prevent unintended state changes. Where appropriate, human-in-the-loop approval should gate privileged write operations (update-cfg/update-config) identified as high-impact.
+LLM-driven network configuration introduces risks such as unintended or malicious commands, emulator vulnerabilities, and data exposure; to mitigate these, NetConfBench SHOULD enforce strict input validation (e.g., YANG/XML schema checks), run emulated devices in isolated sandboxes with limited privileges, encrypt and restrict access to task definitions and logs, employ human-in-the-loop approval for generated configurations, and use curated prompt templates and fine-tuning to reduce LLM hallucinations. Validation endpoints MUST enforce read-only execution (e.g., execute-validation) to prevent unintended state changes. Where appropriate, human-in-the-loop approval SHOULD gate privileged write operations (update-cfg/update-config) identified as high-impact.
 
 # IANA Considerations
 
@@ -874,4 +963,4 @@ This document has no IANA actions.
 # Acknowledgments
 {:numbered="false"}
 
-TODO acknowledge.
+The authors thank Laurent Ciavaglia for his valuable comments and suggestions.
